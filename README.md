@@ -23,7 +23,7 @@ A modern, responsive portfolio website showcasing my expertise in DevOps, Cloud 
 
 ## 📋 Prerequisites
 
-- **Node.js** 18+ or **Bun** runtime
+- **Node.js** 18+ or **Bun** runtime 
 - **Git** for version control
 - **Modern browser** with ES6+ support
 
@@ -33,10 +33,10 @@ A modern, responsive portfolio website showcasing my expertise in DevOps, Cloud 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yousafkhamza/yousafkhamza.github.io.git
+git clone https://github.com/Abhilash-1201/Abhilash-1201.github.io.git
 
 # Navigate to project directory
-cd yousafkhamza.github.io
+cd Abhilash-1201.github.io.git
 
 # Install dependencies
 npm install
@@ -55,10 +55,10 @@ npm run preview
 
 ```bash
 # Clone the repository
-git clone https://github.com/yousafkhamza/yousafkhamza.github.io.git
+git clone https://github.com/Abhilash-1201/Abhilash-1201.github.io.git
 
 # Navigate to project directory
-cd abhilashrl1201.github.io
+cd Abhilash-1201.github.io.git
 
 # Install dependencies
 bun install
@@ -174,7 +174,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Abhilash RL**  
 AWS DevOps Engineer | Cloud Architect
 
-- **Portfolio** - [abhilashrl1201.github.io](https://abhilashrl1201.github.io)
+- **Portfolio** - [abhilashrl1201.github.io](https://Abhilash-1201.github.io)
 - **LinkedIn** - [linkedin.com/in/abhilash-rl](https://linkedin.com/in/abhilash-rl)
 - **GitHub** - [github.com/Abhilash-1201](https://github.com/Abhilash-1201)
 - **Email** - Available through portfolio contact form
@@ -182,3 +182,4 @@ AWS DevOps Engineer | Cloud Architect
 ---
 
 ⭐ Star this repository if you found it helpful!
+
