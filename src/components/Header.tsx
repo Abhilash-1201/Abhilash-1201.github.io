@@ -43,14 +43,14 @@ const Header = () => {
           <div className="flex-shrink-0">
             <AnimatedYKHLogo size={32} />
           </div>
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             <span className="hidden sm:inline-block font-signature text-lg sm:text-xl md:text-2xl font-medium text-center">
               Abhilash RL
             </span>
             <span className="sm:hidden font-signature text-base font-medium">
               RS
             </span>
-          </div>
+          </div> */}
         </a>
 
         {/* Desktop Navigation */}
