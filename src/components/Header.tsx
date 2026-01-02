@@ -44,10 +44,10 @@ const Header = () => {
             <AnimatedYKHLogo size={32} />
           </div>
           <div className="flex items-center">
-            <span className="hidden sm:inline-block  text-lg sm:text-xl md:text-2xl font-medium text-center">
+            <span className="hidden sm:inline-block font-signature text-lg sm:text-xl md:text-2xl font-medium text-center">
               Abhilash RL
             </span>
-            <span className="sm:hidden text-base font-medium">
+            <span className="sm:hidden font-signature text-base font-medium">
               RS
             </span>
           </div>
