@@ -1,185 +1,38 @@
-# Abhilash - AWS Cloud and DevOps Engineer Portfolio
+# abhilash-1201.github.io
 
-A modern, responsive portfolio website showcasing my expertise in DevOps, Cloud Engineering, and Infrastructure Automation. Built with cutting-edge web technologies and featuring an interactive terminal experience.
+Personal portfolio of **Abhilash RL**, Senior DevOps Engineer. Plain HTML, CSS and JavaScript with no build step, deployed to GitHub Pages by GitHub Actions on every push to `main`.
 
-## 🚀 Features
+Live: https://abhilash-1201.github.io/
 
-- **Responsive Design** - Mobile-first approach ensuring perfect display across all devices
-- **Interactive Terminal** - Unique command-line interface to explore my profile
-- **Modern UI/UX** - Clean, professional design with smooth animations
-- **Dark/Light Mode** - Theme toggle for optimal viewing experience
-- **Performance Optimized** - Fast loading with modern build tools
-- **Accessibility** - WCAG compliant with proper semantic markup
+## What's in here
 
-## 🛠️ Tech Stack
+```
+index.html                     page content
+assets/css/style.css           styles
+assets/js/main.js              cursor-tracking avatar + build stamp
+assets/avatar/*.webp|svg       9 avatar images, one per gaze direction
+assets/favicon.svg
+.github/workflows/deploy.yml   validate → assemble → deploy to Pages
+```
 
-- **Frontend Framework** - React 18 with TypeScript
-- **Build Tool** - Vite for lightning-fast development
-- **Styling** - Tailwind CSS with custom design system
-- **UI Components** - Radix UI with shadcn/ui
-- **Animations** - CSS animations and transitions
-- **Icons** - Lucide React icon library
-- **Deployment** - GitHub Pages
+## How the cursor tracking works
 
-## 📋 Prerequisites
+There are nine images of the same character, identical except for where the head and eyes point:
+`up-left, up, up-right, left, center, right, down-left, down, down-right`.
 
-- **Node.js** 18+ or **Bun** runtime 
-- **Git** for version control
-- **Modern browser** with ES6+ support
+`main.js` finds the face's position on screen, works out the angle to the cursor, picks the nearest of the eight directions (or `center` when the cursor is close to the face) and shows that image. All nine are stacked and preloaded, so the swap is instant. On phones, or when the mouse is still, the avatar glances around on its own.
 
-## 🚀 Quick Start
+If the face isn't centred where the script expects, adjust `FACE_X` / `FACE_Y` at the top of `main.js`.
 
-### Using npm (Node.js 18+ required)
+## Deploy
+
+1. Push to `main`.
+2. In the repo go to **Settings → Pages → Build and deployment → Source** and choose **GitHub Actions** (one-time).
+3. The workflow checks that every referenced file exists, stamps the commit SHA into the footer and publishes the site.
+
+## Run locally
 
 ```bash
-# Clone the repository
-git clone https://github.com/Abhilash-1201/Abhilash-1201.github.io.git
-
-# Navigate to project directory
-cd Abhilash-1201.github.io.git
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+python3 -m http.server 8000
+# open http://localhost:8000
 ```
-
-### Using Bun (Recommended)
-
-```bash
-# Clone the repository
-git clone https://github.com/Abhilash-1201/Abhilash-1201.github.io.git
-
-# Navigate to project directory
-cd Abhilash-1201.github.io.git
-
-# Install dependencies
-bun install
-
-# Start development server
-bun run dev
-
-# Build for production
-bun run build
-
-# Preview production build
-bun run preview
-```
-
-## 📱 Development
-
-### Available Scripts
-
-| Command         | npm               | Bun               | Description              |
-| --------------- | ----------------- | ----------------- | ------------------------ |
-| **Development** | `npm run dev`     | `bun run dev`     | Start development server |
-| **Build**       | `npm run build`   | `bun run build`   | Build for production     |
-| **Preview**     | `npm run preview` | `bun run preview` | Preview production build |
-| **Lint**        | `npm run lint`    | `bun run lint`    | Run ESLint checks        |
-
-### Development Server
-
-The development server runs on `http://localhost:8080` with:
-
-- **Hot Module Replacement** - Instant updates without page refresh
-- **TypeScript Support** - Real-time type checking
-- **CSS Live Reload** - Instant style updates
-
-## 🏗️ Project Structure
-
-```
-├── public/                 # Static assets
-│   ├── resume.pdf         # Download resume
-│   └── *.png             # Company logos & icons
-├── src/
-│   ├── components/        # React components
-│   │   ├── ui/           # Reusable UI components
-│   │   ├── contact/      # Contact form components
-│   │   └── *.tsx         # Page components
-│   ├── hooks/            # Custom React hooks
-│   ├── lib/              # Utility functions
-│   └── pages/            # Page components
-├── tailwind.config.ts    # Tailwind CSS configuration
-├── vite.config.ts        # Vite configuration
-└── package.json          # Project dependencies
-```
-
-## 🎨 Key Components
-
-- **Hero Section** - Interactive introduction with typewriter effect
-- **About** - Professional summary with interactive terminal
-- **Experience** - Career timeline with detailed descriptions
-- **Skills** - Technical expertise with proficiency levels
-- **Certifications** - Professional certifications and achievements
-- **Contact** - Contact form with social links
-
-## 🔧 Customization
-
-### Theme Configuration
-
-- Edit `tailwind.config.ts` for design system customization
-- Modify color scheme in `src/index.css`
-- Update component styling in respective `.tsx` files
-
-### Content Updates
-
-- Personal information: `src/components/Hero.tsx`
-- Professional experience: `src/components/Experience.tsx`
-- Skills and certifications: `src/components/Skills.tsx` & `src/components/Certifications.tsx`
-
-## 🚀 Deployment
-
-### GitHub Pages (Automatic)
-
-This repository is configured for automatic deployment to GitHub Pages on every push to the main branch.
-
-### Manual Deployment
-
-```bash
-# Build the project
-npm run build  # or bun run build
-
-# Deploy to GitHub Pages
-# (Files are automatically deployed from the dist/ folder)
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Design Inspiration** - Modern portfolio best practices
-- **Development Platform** - Built with [Lovable](https://lovable.dev) for rapid prototyping
-- **UI Components** - [shadcn/ui](https://ui.shadcn.com/) component library
-- **Icons** - [Lucide](https://lucide.dev/) icon library
-
-## 📞 Contact
-
-**Abhilash RL**  
-AWS DevOps Engineer | Cloud Architect
-
-- **Portfolio** - [abhilashrl1201.github.io](https://Abhilash-1201.github.io)
-- **LinkedIn** - [linkedin.com/in/abhilash-rl](https://linkedin.com/in/abhilash-rl)
-- **GitHub** - [github.com/Abhilash-1201](https://github.com/Abhilash-1201)
-- **Email** - Available through portfolio contact form
-
----
-
-⭐ Star this repository if you found it helpful!
-
