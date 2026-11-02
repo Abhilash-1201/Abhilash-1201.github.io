@@ -152,6 +152,28 @@
     idle();
   })();
 
+  // ---------- certification validity bars ----------
+  document.querySelectorAll(".cert-card[data-expires]").forEach(function (card) {
+    var iss = card.dataset.issued.split("-"), exp = card.dataset.expires.split("-");
+    var a = new Date(+iss[0], +iss[1] - 1, 1), b = new Date(+exp[0], +exp[1] - 1, 1), now = new Date();
+    var share = Math.max(0, Math.min(1, (now - a) / (b - a)));
+    var fill = card.querySelector(".v-fill"), status = card.querySelector(".v-status");
+    var months = (b.getFullYear() - now.getFullYear()) * 12 + (b.getMonth() - now.getMonth());
+    if (now >= b) {
+      card.classList.add("is-expired");
+      status.classList.add("v-expired");
+      status.textContent = "Expired";
+      share = 1;
+    } else {
+      status.textContent = "Valid · " + (months >= 12 ? Math.floor(months / 12) + " yr " + (months % 12) + " mo" : months + " mo") + " left";
+    }
+    var set = function () { fill.style.width = (share * 100).toFixed(1) + "%"; };
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { set(); io.disconnect(); } });
+      io.observe(card);
+    } else { set(); }
+  });
+
   // ---------- footer: GitHub Actions stamps the commit SHA and build date ----------
   var y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
