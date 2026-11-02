@@ -353,6 +353,61 @@ main > section + section { border-top: 1px solid var(--line); }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .tags li { padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink); font: 500 13px var(--body); }
 
+/* Experience: road map */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.journey { position: relative; margin-top: 8px; }
+.road { display: block; width: 100%; height: auto; overflow: hidden; }
+.road text { font-family: var(--display); }
+.stop { cursor: pointer; outline: none; }
+.stop-stem { stroke: #9aa5b4; stroke-width: 3; }
+.stop-pin { fill: #fff; stroke: var(--accent); stroke-width: 3; transition: fill .2s; }
+.stop-num { font: 800 15px var(--display); fill: var(--accent); pointer-events: none; }
+.stop-ring { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.stop-year { font: 700 12px var(--body); letter-spacing: .14em; fill: var(--accent); }
+.stop-role { font: 800 17px var(--display); fill: var(--ink); }
+.stop:hover .stop-pin, .stop:focus-visible .stop-pin, .stop.is-active .stop-pin { fill: var(--accent); }
+.stop:hover .stop-num, .stop:focus-visible .stop-num, .stop.is-active .stop-num { fill: #fff; }
+.stop.is-active .stop-ring { animation: ring 1.6s ease-out infinite; }
+.stop:focus-visible .stop-role { text-decoration: underline; }
+@keyframes ring { 0% { opacity: .7; transform: scale(1); } 100% { opacity: 0; transform: scale(2.1); } }
+.road-end { font: 700 11px var(--body); letter-spacing: .2em; fill: #9aa5b4; }
+
+/* destination board: a green highway sign on two posts */
+.dest-board {
+  --post-x: 50%;
+  position: absolute; left: 0; top: 0; z-index: 2;
+  width: min(330px, 92%);
+  pointer-events: none;
+  opacity: 0; transform: translateY(10px) scale(.96); transform-origin: var(--post-x) 100%;
+  transition: opacity .25s ease, transform .35s cubic-bezier(.2,.8,.2,1.2);
+}
+.dest-board.show { opacity: 1; transform: none; }
+.db-sign {
+  position: relative; display: grid; gap: 4px;
+  padding: 18px 20px 16px;
+  border-radius: 12px;
+  background: #0B6B3A; color: #fff;
+  box-shadow: inset 0 0 0 3px #0B6B3A, inset 0 0 0 5px #fff, 0 14px 30px rgba(11,107,58,.28);
+}
+.db-exit { position: absolute; top: -13px; right: 18px; padding: 3px 10px; border-radius: 6px; background: #0B6B3A; box-shadow: inset 0 0 0 2px #fff; font: 800 11px var(--display); letter-spacing: .12em; }
+.db-dates { font: 600 11.5px var(--body); letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+.db-sign h4 { margin: 2px 0 0; font: 800 23px/1.15 var(--display); letter-spacing: -0.005em; }
+.db-co { font: 600 15px var(--body); }
+.db-meta { font-size: 13.5px; opacity: .85; }
+.db-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.db-skills li { padding: 2px 9px; border: 1px solid rgba(255,255,255,.55); border-radius: 999px; font: 500 12px var(--body); }
+.db-now { justify-self: start; margin-top: 6px; padding: 2px 9px; border-radius: 999px; background: #FDE047; color: #14532D; font: 700 11px var(--body); letter-spacing: .1em; text-transform: uppercase; }
+.db-post { position: absolute; top: 100%; width: 5px; height: 16px; background: linear-gradient(90deg, #9aa5b4, #6b7685); }
+.db-post:nth-of-type(1) { left: calc(var(--post-x) - 26px); }
+.db-post:nth-of-type(2) { left: calc(var(--post-x) + 21px); }
+
+/* phones: vertical road, the board sits under it */
+.journey.is-narrow .road { max-width: 420px; margin-inline: auto; }
+.journey.is-narrow .dest-board { position: relative; width: 100%; max-width: 420px; margin: 18px auto 0; }
+.journey.is-narrow .db-post { display: none; }
+.journey.is-narrow .stop-role { font-size: 17px; }
+.journey.is-narrow .stop-year { font-size: 13px; }
+
 /* Projects */
 .projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
 .project { display: grid; gap: 14px; align-content: start; padding: 34px; border: 1px solid var(--line); border-radius: 16px; background: #fff; transition: border-color .2s, box-shadow .2s, transform .2s; }
