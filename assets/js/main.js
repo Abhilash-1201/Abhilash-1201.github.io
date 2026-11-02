@@ -1,103 +1,170 @@
-/* Cursor-tracking avatar: 9 pre-rendered images, one per gaze direction.
-   We work out which way the cursor is from the face and show that image. */
+/* Profile page: click "Visit my profile" → the welcome screen fades → the intro video plays with sound
+   beside the name while the hero copy appears. Plus the cursor-tracking photo in About and the footer stamp. */
 (function () {
   "use strict";
 
-  var avatar = document.getElementById("avatar");
-  if (avatar) initAvatar(avatar);
+  var root = document.documentElement;
+  var gate = document.getElementById("gate");
+  var enterBtn = document.getElementById("enter");
+  var hero = document.querySelector(".hero");
+  var video = document.getElementById("talk");
+  var nameEl = document.getElementById("name");
+  var steps = Array.prototype.slice.call(document.querySelectorAll(".hero [data-step]"));
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  function initAvatar(el) {
-    var imgs = {};
-    el.querySelectorAll("img[data-dir]").forEach(function (img) { imgs[img.dataset.dir] = img; });
-
-    // Where the face sits inside the square image (0..1). Tune after swapping in the real images.
-    var FACE_X = 0.49, FACE_Y = 0.28;
-    // Inside this radius (as a share of the avatar width) the avatar looks straight ahead.
-    var DEAD_ZONE = 0.14;
-    // Clockwise from "right", in 45° steps (screen y grows downward).
-    var SECTORS = ["right", "down-right", "down", "down-left", "left", "up-left", "up", "up-right"];
-
-    var current = "center";
-    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var lastMove = 0, idleTimer = null, idleStep = 0, raf = 0, pending = null;
-
-    function show(dir) {
-      if (dir === current || !imgs[dir]) return;
-      imgs[current].classList.remove("on");
-      imgs[dir].classList.add("on");
-      current = dir;
+  // ---------- sound ----------
+  // The click on "Visit my profile" lets the browser play with sound; the button in the hero mutes it.
+  var soundBtn = document.getElementById("sound");
+  var soundOn = true;
+  function setSound(on, blocked) {
+    soundOn = on;
+    video.muted = !on;
+    if (on) video.volume = 1;
+    if (soundBtn) {
+      soundBtn.setAttribute("aria-pressed", on ? "true" : "false");
+      soundBtn.classList.toggle("nudge", !!blocked);
+      soundBtn.querySelector("span").textContent = on ? "Sound on" : (blocked ? "Tap for sound" : "Sound off");
     }
-
-    function directionFor(x, y) {
-      var r = el.getBoundingClientRect();
-      var fx = r.left + r.width * FACE_X;
-      var fy = r.top + r.height * FACE_Y;
-      var dx = x - fx, dy = y - fy;
-      if (Math.hypot(dx, dy) < r.width * DEAD_ZONE) return { dir: "center", dx: 0, dy: 0 };
-      var angle = Math.atan2(dy, dx);                       // -PI..PI, 0 = right
-      var idx = Math.round(angle / (Math.PI / 4));          // -4..4
-      idx = (idx + 8) % 8;
-      var reach = Math.max(window.innerWidth, window.innerHeight) * 0.6;
-      return { dir: SECTORS[idx], dx: clamp(dx / reach), dy: clamp(dy / reach) };
+  }
+  if (soundBtn) soundBtn.addEventListener("click", function () {
+    var on = !soundOn;
+    setSound(on);
+    if (on && (video.ended || video.paused)) {      // turning sound on after the hello replays it
+      try { video.currentTime = 0; } catch (e) {}
+      video.play().catch(function () {});
     }
+  });
 
-    function clamp(v) { return Math.max(-1, Math.min(1, v)); }
-
-    function apply() {
-      raf = 0;
-      if (!pending) return;
-      var g = directionFor(pending.x, pending.y);
-      show(g.dir);
-      if (!reduceMotion) {
-        el.style.transform = "translate(" + (g.dx * 8).toFixed(1) + "px," + (g.dy * 6).toFixed(1) + "px)";
-      }
+  // ---------- name: split into letters ("R.L" in the accent colour) ----------
+  var letters = [];
+  (function split() {
+    var text = nameEl.textContent.trim();
+    nameEl.textContent = "";
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < text.length; i++) {
+      var s = document.createElement("span");
+      s.className = "l" + (i >= text.indexOf(" ") + 1 ? " acc" : "");
+      s.setAttribute("aria-hidden", "true");
+      s.textContent = text[i] === " " ? " " : text[i];
+      frag.appendChild(s);
+      letters.push(s);
     }
+    nameEl.appendChild(frag);
+  })();
 
-    function onPointer(e) {
-      pending = { x: e.clientX, y: e.clientY };
-      lastMove = Date.now();
-      stopIdle();
-      if (!raf) raf = requestAnimationFrame(apply);
-      scheduleIdle();
+  // ---------- intro ----------
+  var timers = [];
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+  function reset() {
+    timers.forEach(clearTimeout); timers = [];
+    letters.forEach(function (l) { l.classList.remove("on"); });
+    steps.forEach(function (s) { s.classList.remove("on"); });
+    hero.classList.remove("show-still");
+  }
+  function revealAll(instant) {
+    if (instant) {
+      letters.forEach(function (l) { l.classList.add("on"); });
+      steps.forEach(function (s) { s.classList.add("on"); });
+      return;
     }
+    letters.forEach(function (l, i) { later(function () { l.classList.add("on"); }, 250 + i * 70); });
+    var after = 250 + letters.length * 70 + 150;
+    steps.forEach(function (s, i) { later(function () { s.classList.add("on"); }, after + i * 220); });
+  }
+  function showStill() { hero.classList.add("show-still"); }
 
-    // When nobody is moving a cursor (phones, or a still mouse), glance around now and then.
-    var IDLE_PATH = ["down", "down", "center", "right", "up-right", "center", "down", "left", "center"];
-    function scheduleIdle() {
-      clearTimeout(idleTimer);
-      if (reduceMotion) return;
-      idleTimer = setTimeout(idleTick, 4000);
+  function play() {
+    reset();
+    if (reduceMotion) { hero.classList.remove("armed"); showStill(); revealAll(true); return; }
+    hero.classList.add("armed");
+    revealAll(false);
+    try { video.currentTime = 0; } catch (e) {}
+    setSound(soundOn);
+    if (soundBtn) soundBtn.hidden = false;
+    var fail = function () { if (soundBtn) soundBtn.hidden = true; showStill(); };
+    var p = video.play();
+    if (p && p.catch) {
+      p.catch(function () {
+        // Some browsers refuse sound; play silently and offer "Tap for sound".
+        if (!video.muted) { setSound(false, true); video.play().catch(fail); }
+        else fail();
+      });
     }
-    function idleTick() {
-      if (Date.now() - lastMove < 3500) return scheduleIdle();
-      el.style.transform = "";
-      show(IDLE_PATH[idleStep % IDLE_PATH.length]);
-      idleStep++;
-      idleTimer = setTimeout(idleTick, 1300);
-    }
-    function stopIdle() { clearTimeout(idleTimer); }
-
-    window.addEventListener("pointermove", onPointer, { passive: true });
-    window.addEventListener("pointerdown", onPointer, { passive: true });
-    document.addEventListener("mouseleave", function () { show("center"); el.style.transform = ""; scheduleIdle(); });
-
-    // Warm the cache so the first swap never flickers.
-    Object.keys(imgs).forEach(function (k) {
-      var i = imgs[k];
-      if (i.decode) i.decode().catch(function () {});
-    });
-
-    scheduleIdle();
   }
 
-  // Footer: GitHub Actions replaces the placeholders with the commit SHA and build date.
-  var year = document.getElementById("year");
-  if (year) year.textContent = new Date().getFullYear();
-  var build = document.getElementById("build");
-  if (build) {
-    var sha = build.dataset.sha || "", date = build.dataset.date || "";
-    if (sha && sha.indexOf("__") !== 0) {
-      build.innerHTML = "Deployed to GitHub Pages by GitHub Actions, commit <code>" + sha.slice(0, 7) + "</code> on " + date;
+  function enter() {
+    if (!gate || gate.classList.contains("gone")) return;
+    gate.classList.add("gone");
+    root.style.overflow = "";
+    play();
+    setTimeout(function () { gate.hidden = true; }, 800);
+  }
+
+  if (gate) {
+    root.style.overflow = "hidden";
+    if (!reduceMotion) hero.classList.add("armed");     // keep the hero copy hidden behind the gate
+    enterBtn.addEventListener("click", enter);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") enter();
+    });
+  } else {
+    revealAll(true);
+  }
+  video.addEventListener("error", function () { showStill(); });
+
+  var replay = document.getElementById("replay");
+  if (replay) replay.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    setSound(true);
+    play();
+  });
+
+  // ---------- About photo: he looks toward the cursor (9 direction images) ----------
+  var look = document.getElementById("look");
+  if (look) (function () {
+    var imgs = {};
+    look.querySelectorAll("img[data-dir]").forEach(function (i) { imgs[i.dataset.dir] = i; });
+    var FACE_X = 0.49, FACE_Y = 0.28, DEAD = 0.14;
+    var SECTORS = ["right", "down-right", "down", "down-left", "left", "up-left", "up", "up-right"];
+    var IDLE_PATH = ["down", "down", "center", "right", "up-right", "center", "down", "left", "center"];
+    var cur = "center", queued = null, frame = 0, visible = false, lastMove = 0, idleTimer = 0, idleStep = 0;
+    function show(d) {
+      if (!imgs[d] || d === cur) return;
+      imgs[cur].classList.remove("on"); imgs[d].classList.add("on"); cur = d;
     }
+    function update() {
+      frame = 0;
+      if (!queued || !visible) return;
+      var r = look.getBoundingClientRect();
+      var dx = queued.x - (r.left + r.width * FACE_X), dy = queued.y - (r.top + r.height * FACE_Y);
+      if (Math.hypot(dx, dy) < r.width * DEAD) return show("center");
+      show(SECTORS[(Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) + 8) % 8]);
+    }
+    function idle() {
+      clearTimeout(idleTimer);
+      if (reduceMotion) return;
+      idleTimer = setTimeout(function tick() {
+        if (Date.now() - lastMove < 3500 || !visible) return idle();
+        show(IDLE_PATH[idleStep++ % IDLE_PATH.length]);
+        idleTimer = setTimeout(tick, 1300);
+      }, 4000);
+    }
+    window.addEventListener("pointermove", function (e) {
+      queued = { x: e.clientX, y: e.clientY }; lastMove = Date.now(); idle();
+      if (!frame) frame = requestAnimationFrame(update);
+    }, { passive: true });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) { visible = en[0].isIntersecting; if (!visible) show("center"); }).observe(look);
+    } else { visible = true; }
+    Object.keys(imgs).forEach(function (k) { if (imgs[k].decode) imgs[k].decode().catch(function () {}); });
+    idle();
+  })();
+
+  // ---------- footer: GitHub Actions stamps the commit SHA and build date ----------
+  var y = document.getElementById("year");
+  if (y) y.textContent = new Date().getFullYear();
+  var build = document.getElementById("build");
+  if (build && build.dataset.sha && build.dataset.sha.indexOf("__") !== 0) {
+    build.innerHTML = "Deployed to GitHub Pages by GitHub Actions, commit <code>" + build.dataset.sha.slice(0, 7) + "</code> on " + build.dataset.date;
   }
 })();

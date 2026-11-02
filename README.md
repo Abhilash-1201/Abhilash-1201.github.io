@@ -7,13 +7,28 @@ Live: https://abhilash-1201.github.io/
 ## What's in here
 
 ```
-index.html                     page content
-assets/css/style.css           styles
-assets/js/main.js              cursor-tracking avatar + build stamp
-assets/avatar/*.webp|svg       9 avatar images, one per gaze direction
-assets/favicon.svg
+index.html                     welcome screen (gate) + profile page
+assets/css/style.css           styles (white theme)
+assets/js/landing.js           welcome screen: CI/CD loop + construction site animation
+assets/js/main.js              intro video playback, sound toggle, replay, About photo tracking, build stamp
+assets/video/intro.mp4         talking intro shown beside the name after "Visit my profile"
+assets/video/final-pose.webp   still frame used if the video can't play
+assets/logos/*.png             tool logos on the construction-site signs
+assets/avatar/*.webp           9 photos, one per gaze direction (About section)
 .github/workflows/deploy.yml   validate → assemble → deploy to Pages
 ```
+
+## How the intro works
+
+The page opens on the welcome screen. Clicking **Visit my profile** fades it out and plays `intro.mp4`
+with sound (the click is what lets the browser play audio). If a browser still blocks sound, the video
+plays muted and the **Tap for sound** button appears. **Replay intro** in the hero plays it again.
+
+To swap the video, replace `assets/video/intro.mp4` (and `final-pose.webp` with its last frame).
+Keep the video background pure white so it blends into the page.
+
+Placeholders that still need your details are shown as dashed blue boxes (Education, Certifications,
+Achievements). Search `index.html` for `class="todo"` to find them.
 
 ## How the cursor tracking works
 
