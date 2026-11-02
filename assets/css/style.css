@@ -190,7 +190,7 @@ ul { padding: 0; list-style: none; }
   z-index: 30;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   height: 64px;
   padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
@@ -199,8 +199,6 @@ ul { padding: 0; list-style: none; }
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
-.brand { font: 800 18px/1 var(--display); letter-spacing: -0.01em; text-decoration: none; }
-.brand span { color: var(--accent); }
 .bar nav { display: flex; gap: 30px; }
 .bar nav a {
   position: relative;
@@ -429,7 +427,6 @@ main > section + section { border-top: 1px solid var(--line); }
   .gate-site { width: 175vw; }
   .gate-inner { padding-bottom: 20vh; }
   .social { width: 40px; height: 40px; }
-  .brand { display: none; }
   .bar { justify-content: center; }
   .bar nav { gap: 6px; }
   .bar nav a { padding: 8px 10px; }
