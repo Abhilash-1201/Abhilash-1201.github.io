@@ -196,9 +196,9 @@
     <video id="talk" class="talk" src="assets/video/intro.mp4" playsinline preload="auto" aria-label="Abhilash at his desk says hello and introduces himself as a Senior DevOps Engineer."></video>
     <img class="still" src="assets/video/final-pose.webp" alt="" width="860" height="802">
   </div>
-  <button type="button" class="sound" id="sound" aria-pressed="false" hidden>
-    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path class="waves" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="cross" d="M16.5 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    <span>Sound on</span>
+  <button type="button" class="play" id="play" aria-label="Play intro" hidden>
+    <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 5.8v12.4a.8.8 0 0 0 1.2.7l10-6.2a.8.8 0 0 0 0-1.4l-10-6.2a.8.8 0 0 0-1.2.7Z"/></svg>
+    <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>
   </button>
 
   <div class="hero-copy">
@@ -226,7 +226,7 @@
 <main>
 
 <section class="about wrap" id="about">
-  <h2 class="kicker">About</h2>
+  <h2 class="kicker">About Me</h2>
   <div class="about-grid">
     <figure class="about-photo" id="look" role="img" aria-label="Abhilash at his laptop wearing headphones. He looks toward your cursor.">
       <img data-dir="center" class="on" src="assets/avatar/center.webp" alt="" width="960" height="960" decoding="async">
@@ -240,29 +240,16 @@
       <img data-dir="down-right" src="assets/avatar/down-right.webp" alt="" width="960" height="960" decoding="async">
     </figure>
     <div class="about-text">
-      <p class="statement">I'm a Senior DevOps Engineer with six years across cloud infrastructure, infrastructure as code and cloud operations, turning complex infrastructure into <em>reliable, production-ready platforms</em>.</p>
-      <p>I design and run AWS environments, Kubernetes platforms and the CI/CD pipelines that ship to them. Most of my work lives in Terraform. I care about least-privilege IAM, pipelines that authenticate without long-lived keys, monitoring that catches problems before users do, and cloud bills that stay sensible.</p>
+      <p class="statement">I'm a Senior DevOps Engineer with six years of experience designing, building, and managing cloud infrastructure, automation, and platform engineering solutions. I specialize in transforming complex infrastructure requirements into <em>scalable, secure, and reliable production environments</em>.</p>
+      <p>My work spans AWS and Azure cloud platforms, Kubernetes orchestration, Infrastructure as Code using Terraform, and end-to-end CI/CD automation. I focus on building secure cloud architectures, implementing least-privilege access controls, eliminating manual operational tasks, and establishing robust monitoring and observability.</p>
+      <p>I believe in building infrastructure that is not only reliable and scalable but also secure, automated, and cost-efficient.</p>
       <dl class="facts">
         <div><dt>Based in</dt><dd>Bengaluru, India</dd></div>
-        <div><dt>Experience</dt><dd>6 years in DevOps &amp; cloud</dd></div>
-        <div><dt>Focus</dt><dd>AWS, Azure, Kubernetes, Terraform</dd></div>
+        <div><dt>Experience</dt><dd>6 Years in DevOps &amp; Cloud Engineering</dd></div>
+        <div><dt>Core Expertise</dt><dd>AWS, Azure, Kubernetes, Terraform, CI/CD, Infrastructure as Code, Cloud Security &amp; Observability</dd></div>
       </dl>
     </div>
   </div>
-
-  <figure class="plan" aria-label="Career summary written as a Terraform plan">
-    <div class="plan-bar"><span></span><span></span><span></span><b>~/career</b></div>
-<pre><code><span class="p-cmd">$ terraform plan</span>
-
-<span class="p-add">  + aws_platform</span>     <span class="p-val">"EKS, ECS, VPC, IAM, KMS"</span>
-<span class="p-add">  + kubernetes</span>       <span class="p-val">"EKS upgrades, Argo CD GitOps"</span>
-<span class="p-add">  + ci_cd</span>            <span class="p-val">"GitHub Actions, GitLab, CircleCI, Jenkins"</span>
-<span class="p-add">  + observability</span>    <span class="p-val">"Datadog, CloudWatch, New Relic"</span>
-<span class="p-add">  + security</span>         <span class="p-val">"OIDC, SCPs, least-privilege IAM"</span>
-<span class="p-chg">  ~ cloud_costs</span>      <span class="p-val">"scheduled, optimized"</span>
-
-<span class="p-sum">Plan:</span> 6 years, 4 engagements, <span class="p-add">0 to destroy.</span></code></pre>
-  </figure>
 </section>
 
 <section class="education wrap" id="education">

@@ -12,27 +12,28 @@
   var steps = Array.prototype.slice.call(document.querySelectorAll(".hero [data-step]"));
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // ---------- sound ----------
-  // The click on "Visit my profile" lets the browser play with sound; the button in the hero mutes it.
-  var soundBtn = document.getElementById("sound");
-  var soundOn = true;
-  function setSound(on, blocked) {
-    soundOn = on;
-    video.muted = !on;
-    if (on) video.volume = 1;
-    if (soundBtn) {
-      soundBtn.setAttribute("aria-pressed", on ? "true" : "false");
-      soundBtn.classList.toggle("nudge", !!blocked);
-      soundBtn.querySelector("span").textContent = on ? "Sound on" : (blocked ? "Tap for sound" : "Sound off");
-    }
+  // ---------- play / pause button on the video ----------
+  // The click on "Visit my profile" lets the browser play with sound. If a browser still refuses,
+  // the video waits on its first frame and the play button pulses until it is pressed.
+  var playBtn = document.getElementById("play");
+  function syncBtn() {
+    if (!playBtn) return;
+    var playing = !video.paused && !video.ended;
+    playBtn.classList.toggle("is-playing", playing);
+    if (playing) playBtn.classList.remove("nudge");
+    playBtn.setAttribute("aria-label", playing ? "Pause intro" : "Play intro");
   }
-  if (soundBtn) soundBtn.addEventListener("click", function () {
-    var on = !soundOn;
-    setSound(on);
-    if (on && (video.ended || video.paused)) {      // turning sound on after the hello replays it
+  ["play", "playing", "pause", "ended"].forEach(function (ev) { video.addEventListener(ev, syncBtn); });
+  function startVideo() {
+    if (video.ended || video.currentTime >= (video.duration || 99) - 0.05) {
       try { video.currentTime = 0; } catch (e) {}
-      video.play().catch(function () {});
     }
+    video.muted = false; video.volume = 1;
+    return video.play();
+  }
+  if (playBtn) playBtn.addEventListener("click", function () {
+    if (!video.paused && !video.ended) video.pause();
+    else startVideo().catch(function () {});
   });
 
   // ---------- name: split into letters ("R.L" in the accent colour) ----------
@@ -79,17 +80,9 @@
     hero.classList.add("armed");
     revealAll(false);
     try { video.currentTime = 0; } catch (e) {}
-    setSound(soundOn);
-    if (soundBtn) soundBtn.hidden = false;
-    var fail = function () { if (soundBtn) soundBtn.hidden = true; showStill(); };
-    var p = video.play();
-    if (p && p.catch) {
-      p.catch(function () {
-        // Some browsers refuse sound; play silently and offer "Tap for sound".
-        if (!video.muted) { setSound(false, true); video.play().catch(fail); }
-        else fail();
-      });
-    }
+    if (playBtn) playBtn.hidden = false;
+    var p = startVideo();
+    if (p && p.catch) p.catch(function () { if (playBtn) playBtn.classList.add("nudge"); });
   }
 
   function enter() {
@@ -110,12 +103,11 @@
   } else {
     revealAll(true);
   }
-  video.addEventListener("error", function () { showStill(); });
+  video.addEventListener("error", function () { if (playBtn) playBtn.hidden = true; showStill(); });
 
   var replay = document.getElementById("replay");
   if (replay) replay.addEventListener("click", function () {
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
-    setSound(true);
     play();
   });
 
