@@ -448,6 +448,34 @@ a:hover .cert-link svg, .all-badges a:hover svg { transform: translate(2px, -2px
 .v-status.v-expired { color: #9CA3AF; }
 .cert-card.is-expired .v-fill { background: #CBD5E1; }
 
+/* Achievements: LinkedIn recommendations */
+.rec-intro { display: grid; gap: 10px; margin-bottom: 40px; }
+.rec-title { font: 900 clamp(36px, 4.6vw, 64px)/1 var(--display); font-stretch: 85%; letter-spacing: -0.025em; }
+.rec-sub { color: var(--muted); max-width: 56ch; }
+.rec-grid { column-count: 3; column-gap: 24px; }
+.rec-card {
+  --av: #2563EB;
+  position: relative; break-inside: avoid; display: grid; gap: 22px;
+  margin: 0 0 24px; padding: 62px 28px 26px;
+  border: 1px solid var(--line); border-radius: 16px; background: #fff;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.rec-card::before {
+  content: "\201C"; position: absolute; top: 14px; left: 26px;
+  font: 900 72px/1 var(--display); color: color-mix(in srgb, var(--av) 30%, #fff);
+}
+.rec-card:hover { border-color: #c9d6f5; box-shadow: 0 16px 36px rgba(15,23,42,.08); transform: translateY(-2px); }
+.rec-card blockquote { position: relative; margin: 0; display: grid; gap: 12px; color: #2b313b; font-size: 15.5px; line-height: 1.65; }
+.rec-more { display: inline-flex; align-items: center; gap: 6px; margin-top: -8px; font: 600 13px var(--body); color: var(--accent); text-decoration: none; }
+.rec-more svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.rec-card figcaption { display: flex; align-items: center; gap: 14px; padding-top: 18px; border-top: 1px solid var(--line); }
+.rec-avatar { flex: 0 0 auto; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--av); color: #fff; font: 800 15px var(--display); letter-spacing: .02em; }
+.rec-who { display: grid; gap: 2px; min-width: 0; }
+.rec-who b { font: 700 16px/1.25 var(--display); }
+.rec-who span { font-size: 13px; line-height: 1.4; color: var(--muted); }
+.rec-who small { font-size: 12px; color: #8a919c; }
+.av-0 { --av: #2563EB; } .av-1 { --av: #0F766E; } .av-2 { --av: #C2410C; } .av-3 { --av: #7C3AED; } .av-4 { --av: #0E7490; }
+
 /* Contact */
 .ask { margin-bottom: 52px; font: 900 clamp(40px, 6vw, 88px)/.98 var(--display); font-stretch: 82%; letter-spacing: -0.03em; text-transform: uppercase; }
 .ask span { color: var(--accent); }
@@ -469,6 +497,7 @@ a:hover .cert-link svg, .all-badges a:hover svg { transform: translate(2px, -2px
    ===================================================================== */
 @media (max-width: 1180px) {
   .badge-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rec-grid { column-count: 2; }
 }
 @media (max-width: 960px) {
   :root { --gutter: 22px; }
@@ -498,6 +527,7 @@ a:hover .cert-link svg, .all-badges a:hover svg { transform: translate(2px, -2px
   .bar nav a span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .bar nav svg { width: 22px; height: 22px; }
   .skill-grid { grid-template-columns: minmax(0, 1fr); }
+  .rec-grid { column-count: 1; }
   .big { font-size: min(10vw, 48px); overflow-wrap: anywhere; }
   .facts { grid-template-columns: minmax(0, 1fr); }
   .links li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
