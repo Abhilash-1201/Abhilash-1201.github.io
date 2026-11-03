@@ -67,7 +67,11 @@
   var svg = document.getElementById("road");
   var board = document.getElementById("driveBoard");
   var NS = "http://www.w3.org/2000/svg";
-  var W, H, narrow, path, total, table = [], lens = [], car, carImg, smokeG, stopEls = [];
+  var W, H, narrow, path, total, table = [], lens = [], car, carBody, wheelEls = [], smokeG, stopEls = [];
+  var spin = 0, bounceT = 0, SC = 1, ROAD_W = 46;
+  // Thar side view, in thar-body.png pixels (420 x 192): wheel centres and radius
+  var BODY = { w: 420, h: 192, rear: [92.97, 148.65], front: [359.53, 148.65], r: 41.4 };
+  var HALF_WB = (BODY.front[0] - BODY.rear[0]) / 2, MID_X = (BODY.front[0] + BODY.rear[0]) / 2, GROUND = BODY.rear[1] + BODY.r;
   var pos = null, target = null, dir = 1, shown = -1, parts = [], raf = 0, lastT = 0, puffAcc = 0;
   var CAR_W, CAR_H, AT = [0.14, 0.38, 0.62, 0.86];
 
@@ -106,7 +110,7 @@
     W = Math.max(320, document.documentElement.clientWidth);
     narrow = W < 640;
     H = narrow ? 300 : 360;
-    CAR_W = narrow ? 82 : 128; CAR_H = CAR_W * 226 / 300;
+    CAR_W = narrow ? 104 : 176; SC = CAR_W / BODY.w; CAR_H = BODY.h * SC;
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
     svg.setAttribute("width", W); svg.setAttribute("height", H);
     svg.innerHTML = "";
@@ -116,7 +120,7 @@
       '<linearGradient id="mMid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#93a8c2"/><stop offset="1" stop-color="#d6e0eb"/></linearGradient>' +
       '<linearGradient id="meadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfead8"/><stop offset="1" stop-color="#ffffff"/></linearGradient>' +
       '<linearGradient id="pine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f6b3c"/><stop offset=".55" stop-color="#1f4f2b"/><stop offset="1" stop-color="#16391f"/></linearGradient>' +
-      '<radialGradient id="smoke"><stop offset="0" stop-color="#cbd5e1" stop-opacity=".9"/><stop offset="1" stop-color="#e2e8f0" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="dust"><stop offset="0" stop-color="#b8a07e" stop-opacity=".7"/><stop offset="1" stop-color="#d6c6a8" stop-opacity="0"/></radialGradient><radialGradient id="smoke"><stop offset="0" stop-color="#cbd5e1" stop-opacity=".9"/><stop offset="1" stop-color="#e2e8f0" stop-opacity="0"/></radialGradient>' +
       '<filter id="carSh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#0f172a" flood-opacity=".35"/></filter>';
 
     // mountains in two layers, fading into the white page at the top
@@ -138,7 +142,7 @@
     var pts = [];
     var waves = narrow ? 1 : 2;
     for (var k = 0; k <= 8; k++) pts.push([x0 + (x1 - x0) * k / 8, y0 + Math.sin(k * Math.PI * waves / 4 + 0.6) * amp]);
-    var d = smooth(pts), rw = narrow ? 30 : 46;
+    var d = smooth(pts), rw = narrow ? 30 : 46; ROAD_W = rw;
     el("path", { d: d, fill: "none", stroke: "#0f172a", "stroke-opacity": .12, "stroke-width": rw + 22, "stroke-linecap": "round", transform: "translate(0 10)" }, svg);   // soft shadow
     el("path", { d: d, fill: "none", stroke: "#5b4a3a", "stroke-width": rw + 6, "stroke-linecap": "round", transform: "translate(0 7)" }, svg);                           // road edge (depth)
     el("path", { d: d, fill: "none", stroke: "#ffffff", "stroke-width": rw + 8, "stroke-linecap": "round" }, svg);                                                         // kerb white
@@ -180,11 +184,20 @@
     });
 
     smokeG = el("g", {}, svg);
+    // the Thar: body + two wheels that really turn; origin = midpoint between the tyre contact points
     car = el("g", { class: "rd-car", filter: "url(#carSh)" }, svg);
-    carImg = el("image", { href: "assets/drive/thar.png", width: CAR_W, height: CAR_H, x: -CAR_W / 2, y: -CAR_H * 0.9 }, car);
+    carBody = el("g", {}, car);
+    el("image", { href: "assets/drive/thar-body.png", width: BODY.w, height: BODY.h, x: -MID_X, y: -GROUND }, carBody);
+    wheelEls = [["rear", BODY.rear], ["front", BODY.front]].map(function (w) {
+      var holder = el("g", { transform: "translate(" + (w[1][0] - MID_X).toFixed(2) + " " + (-BODY.r).toFixed(2) + ")" }, car);
+      var spinG = el("g", {}, holder);
+      el("image", { href: "assets/drive/thar-wheel-" + w[0] + ".png", width: BODY.r * 2, height: BODY.r * 2, x: -BODY.r, y: -BODY.r }, spinG);
+      return spinG;
+    });
 
-    if (pos == null) { pos = 0; target = 0; }
-    pos = Math.min(pos, total); target = Math.min(target, total);
+    var lo = HALF_WB * SC + 6, hi = total - HALF_WB * SC - 6;
+    if (pos == null) { pos = lo; target = lo; }
+    pos = Math.max(lo, Math.min(hi, pos)); target = Math.max(lo, Math.min(hi, target));
     render();
     if (shown >= 0) placeBoard(shown);
   }
@@ -199,24 +212,37 @@
   }
 
   function setTarget(L) {
-    target = Math.max(0, Math.min(total, L));
+    target = Math.max(HALF_WB * SC + 6, Math.min(total - HALF_WB * SC - 6, L));
     if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(loop); }
   }
 
-  function render() {
-    var p = path.getPointAtLength(pos);
-    var a = path.getPointAtLength(Math.max(0, pos - 3)), b = path.getPointAtLength(Math.min(total, pos + 3));
-    var ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
-    ang = Math.max(-14, Math.min(14, ang));
-    car.setAttribute("transform", "translate(" + p.x.toFixed(1) + " " + (p.y + 6).toFixed(1) + ") rotate(" + (ang * dir).toFixed(1) + ") scale(" + dir + " 1)");
-    return p;
+  // Both tyres sit on the road: find where the rear and front wheels touch it, tilt the body to match.
+  var M = { x: 0, y: 0, a: 0 };
+  function render(speed) {
+    var hw = HALF_WB * SC, lane = ROAD_W * 0.16;
+    var p1 = path.getPointAtLength(Math.max(0, pos - hw)), p2 = path.getPointAtLength(Math.min(total, pos + hw));
+    M.a = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+    M.x = (p1.x + p2.x) / 2; M.y = (p1.y + p2.y) / 2 + lane;
+    car.setAttribute("transform", "translate(" + M.x.toFixed(1) + " " + M.y.toFixed(1) + ") rotate(" + (M.a * 180 / Math.PI).toFixed(2) + ") scale(" + (SC * dir).toFixed(4) + " " + SC.toFixed(4) + ")");
+    wheelEls.forEach(function (w) { w.setAttribute("transform", "rotate(" + spin.toFixed(1) + ")"); });
+    // a little suspension bounce while driving
+    var b = speed ? Math.sin(bounceT) * Math.min(1.6, speed * 0.5) : 0;
+    carBody.setAttribute("transform", "translate(0 " + b.toFixed(2) + ")");
+    return M;
+  }
+  // body pixels → screen point
+  function toScreen(lx, ly) {
+    var x = lx * SC * dir, y = ly * SC, c = Math.cos(M.a), s = Math.sin(M.a);
+    return { x: M.x + x * c - y * s, y: M.y + x * s + y * c };
   }
 
-  function puff(p) {
-    // exhaust at the rear of the Thar (left side of the photo, mirrored when driving left)
-    var ex = p.x - dir * CAR_W * 0.46, ey = p.y - CAR_H * 0.18;
-    var c = el("circle", { cx: ex, cy: ey, r: 4, fill: "url(#smoke)" }, smokeG);
-    parts.push({ el: c, x: ex, y: ey, r: 4, life: 0, vx: -dir * (0.5 + Math.random() * 0.7), vy: -(0.3 + Math.random() * 0.6) });
+  function puff() {
+    // exhaust under the rear bumper, plus a little dust from the rear tyre
+    var e = toScreen(12 - MID_X, -24), d = toScreen(BODY.rear[0] - MID_X - BODY.r * 0.6, -2);
+    [[e, 4, "url(#smoke)"], [d, 3, "url(#dust)"]].forEach(function (q) {
+      var c = el("circle", { cx: q[0].x, cy: q[0].y, r: q[1], fill: q[2] }, smokeG);
+      parts.push({ el: c, x: q[0].x, y: q[0].y, r: q[1], life: 0, vx: -dir * (0.5 + Math.random() * 0.7), vy: -(0.2 + Math.random() * 0.6) });
+    });
   }
 
   function loop(now) {
@@ -225,8 +251,10 @@
     pos += (target - pos) * (reduceMotion ? 1 : Math.min(1, 0.07 * dt));
     var vel = pos - prev, speed = Math.abs(vel);
     if (speed > 0.15) dir = vel > 0 ? 1 : -1;
-    var p = render();
-    if (!reduceMotion && speed > 0.6) { puffAcc += speed * 0.12 * dt; while (puffAcc > 1) { puff(p); puffAcc -= 1; } }
+    spin += speed / (BODY.r * SC) * 180 / Math.PI;      // wheels roll exactly as far as the car moves
+    bounceT += speed * 0.18 * dt;
+    render(speed);
+    if (!reduceMotion && speed > 0.6) { puffAcc += speed * 0.1 * dt; while (puffAcc > 1) { puff(); puffAcc -= 1; } }
     parts = parts.filter(function (q) {
       q.life += 0.025 * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.r += 0.4 * dt;
       if (q.life >= 1) { q.el.remove(); return false; }
