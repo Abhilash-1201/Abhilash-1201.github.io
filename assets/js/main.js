@@ -85,8 +85,14 @@
     if (p && p.catch) p.catch(function () { if (playBtn) playBtn.classList.add("nudge"); });
   }
 
+  // Always start from the top: don't let the browser restore the last scroll position on refresh.
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  window.scrollTo(0, 0);
+
   function enter() {
     if (!gate || gate.classList.contains("gone")) return;
+    window.scrollTo(0, 0);
     gate.classList.add("gone");
     root.style.overflow = "";
     play();
@@ -174,11 +180,33 @@
     } else { set(); }
   });
 
-  // ---------- footer: GitHub Actions stamps the commit SHA and build date ----------
+  // ---------- footer ----------
   var y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
-  var build = document.getElementById("build");
-  if (build && build.dataset.sha && build.dataset.sha.indexOf("__") !== 0) {
-    build.innerHTML = "Deployed to GitHub Pages by GitHub Actions, commit <code>" + build.dataset.sha.slice(0, 7) + "</code> on " + build.dataset.date;
-  }
+
+  // Hovering the big name: every tool logo pops out and floats across it.
+  var foot = document.querySelector(".foot-stage");
+  if (foot) (function () {
+    var TOOLS = ["aws-amazonaurora", "aws-amazoncloudfront", "aws-amazoncloudwatch", "aws-amazonec2", "aws-amazonec2autoscaling", "aws-amazonelasticcontainerregistry", "aws-amazonelasticcontainerservice", "aws-amazonelastickubernetesservice", "aws-amazoneventbridge", "aws-amazonrds", "aws-amazonroute53", "aws-amazonsimplenotificationservice", "aws-amazonsimplequeueservice", "aws-amazonsimplestorageservice", "aws-amazonvirtualprivatecloud", "aws-awscloudformation", "aws-awscloudtrail", "aws-awscodebuild", "aws-awscodedeploy", "aws-awscodepipeline", "aws-awsdatabasemigrationservice", "aws-awsidentityandaccessmanagement", "aws-awskeymanagementservice", "aws-awslambda", "aws-awsorganizations", "aws-awsstepfunctions", "aws-elasticloadbalancing", "t-ansible", "t-argo-cd-gitops", "t-aws", "t-azure", "t-bash", "t-bitbucket", "t-circleci", "t-datadog", "t-docker", "t-gcp", "t-git", "t-github-actions", "t-gitlab-ci-cd", "t-gradle", "t-grafana", "t-jenkins", "t-jira", "t-kubernetes", "t-linux", "t-maven", "t-new-relic", "t-nexus", "t-nginx", "t-oidc", "t-okta", "t-opsgenie", "t-prometheus", "t-python-boto3", "t-sonarqube", "t-terraform"];
+    var layer = document.createElement("div");
+    layer.className = "foot-tools"; layer.setAttribute("aria-hidden", "true");
+    // spread the logos evenly over the name, with a little random jitter
+    var n = TOOLS.length, cols = Math.ceil(Math.sqrt(n * 4.2)), rowsN = Math.ceil(n / cols);
+    var order = TOOLS.slice().sort(function () { return Math.random() - .5; });
+    order.forEach(function (t, i) {
+      var c = i % cols, r = Math.floor(i / cols);
+      var img = document.createElement("img");
+      img.src = "assets/skills/" + t + ".svg"; img.alt = ""; img.loading = "lazy";
+      img.style.left = ((c + .5 + (Math.random() - .5) * .6) / cols * 100).toFixed(2) + "%";
+      img.style.top = ((r + .5 + (Math.random() - .5) * .5) / rowsN * 100).toFixed(2) + "%";
+      img.style.setProperty("--d", (Math.random() * .5).toFixed(2) + "s");
+      img.style.setProperty("--f", (2.4 + Math.random() * 2).toFixed(2) + "s");
+      img.style.setProperty("--s", (.8 + Math.random() * .5).toFixed(2));
+      img.style.setProperty("--r", ((Math.random() - .5) * 24).toFixed(1) + "deg");
+      layer.appendChild(img);
+    });
+    foot.appendChild(layer);
+    // touch screens: tap to show / hide
+    foot.addEventListener("click", function () { if (!window.matchMedia("(hover: hover)").matches) foot.classList.toggle("show"); });
+  })();
 })();
