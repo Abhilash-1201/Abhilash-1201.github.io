@@ -457,6 +457,16 @@ main > section + section { border-top: 1px solid var(--line); }
 .pf-scene.is-selling .fs-win { fill: #fde047; }
 .pf-scene.is-charging .fs-win { fill: #e2e8f0; }
 .fs-win { transition: fill .6s; }
+.av-ph { font-size: 9px; font-weight: 800; letter-spacing: .12em; fill: #1e3a8a; }
+.av-phs { font-size: 8.5px; font-weight: 700; fill: #15803d; }
+.av-phb { font-size: 9px; font-weight: 800; letter-spacing: .1em; fill: #fff; }
+.av-small { font-size: 10.5px; font-weight: 700; letter-spacing: .14em; fill: #475569; }
+.av-pod { font-size: 11px; font-weight: 700; fill: #1e293b; }
+.av-build { font-size: 13px; font-weight: 700; fill: #15803d; }
+.av-log { font-size: 11.5px; font-weight: 500; fill: #cbd5e1; font-family: var(--mono); }
+.av-log + .av-log { fill: #64748b; }
+.av-arc { animation: flflow 2s linear infinite; }
+.pf + .pf { margin-top: 0; }
 .pf-scene text { font-family: var(--body); }
 .fl-label { font-size: 11px; font-weight: 700; letter-spacing: .14em; fill: #334155; }
 .fl-panel { font-size: 9.5px; font-weight: 700; letter-spacing: .1em; fill: #e2e8f0; }

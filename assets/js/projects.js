@@ -201,3 +201,192 @@
   }
   requestAnimationFrame(tick);
 })();
+
+/* Projects: the Aviva scene. A family gets life cover from a phone; policies and claims run on an AWS
+   platform (Kubernetes pods); every release ships through the CI/CD pipeline; a health dashboard shows
+   uptime, deployments, Opsgenie alerts and the security audit. Numbers are illustrative. */
+(function () {
+  "use strict";
+  var svg = document.getElementById("avScene");
+  if (!svg) return;
+  var NS = "http://www.w3.org/2000/svg";
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function el(tag, attrs, parent, text) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    (parent || svg).appendChild(n);
+    return n;
+  }
+  el("defs").innerHTML =
+    '<linearGradient id="avSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde68a"/><stop offset=".45" stop-color="#fef3c7"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>' +
+    '<linearGradient id="avShield" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#1e3a8a"/></linearGradient>' +
+    '<linearGradient id="avCloud" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e0ecff"/></linearGradient>' +
+    '<radialGradient id="avGlow"><stop offset="0" stop-color="#fffbe6"/><stop offset=".4" stop-color="#facc15"/><stop offset="1" stop-color="#facc15" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="avGlowB"><stop offset="0" stop-color="#eff6ff"/><stop offset=".4" stop-color="#60a5fa"/><stop offset="1" stop-color="#60a5fa" stop-opacity="0"/></radialGradient>';
+
+  // ---------- 1. family protected by life cover ----------
+  el("rect", { width: 560, height: 1100, fill: "#f8fafc" });
+  el("rect", { width: 560, height: 470, fill: "url(#avSky)" });
+  el("circle", { cx: 90, cy: 80, r: 30, fill: "#fbbf24", opacity: .9 });
+  el("path", { d: "M0 380 C120 356 260 376 380 366 C460 360 520 372 560 368 V470 H0Z", fill: "#bbf7d0" });
+  // house
+  var house = el("g", { transform: "translate(70 250)" });
+  el("rect", { x: 0, y: 50, width: 150, height: 92, fill: "#fff", stroke: "#cbd5e1" }, house);
+  el("polygon", { points: "-12,54 75,-6 162,54", fill: "#b45309" }, house);
+  el("rect", { x: 60, y: 92, width: 30, height: 50, rx: 3, fill: "#92400e" }, house);
+  el("rect", { x: 16, y: 72, width: 30, height: 26, rx: 2, fill: "#bfdbfe", stroke: "#94a3b8" }, house);
+  el("rect", { x: 104, y: 72, width: 30, height: 26, rx: 2, fill: "#bfdbfe", stroke: "#94a3b8" }, house);
+  // family figures
+  function person(x, y, s, shirt) {
+    var g = el("g", { transform: "translate(" + x + " " + y + ") scale(" + s + ")" });
+    el("circle", { cx: 0, cy: -46, r: 9, fill: "#c68a5c" }, g);
+    el("path", { d: "M-12 -34 h24 a4 4 0 0 1 4 4 v22 h-32 v-22 a4 4 0 0 1 4 -4z", fill: shirt }, g);
+    el("rect", { x: -9, y: -8, width: 7, height: 22, rx: 3, fill: "#334155" }, g);
+    el("rect", { x: 2, y: -8, width: 7, height: 22, rx: 3, fill: "#334155" }, g);
+  }
+  person(262, 386, 1.15, "#2563eb"); person(296, 386, 1.08, "#db2777"); person(323, 389, .72, "#16a34a"); person(342, 390, .62, "#f59e0b");
+  // protective shield over the family
+  var sh = el("g", { class: "av-shield", transform: "translate(302 210)" });
+  el("path", { d: "M-150 70 C-150 -10 -80 -66 0 -66 C80 -66 150 -10 150 70", fill: "none", stroke: "#2563eb", "stroke-width": 3, "stroke-dasharray": "2 9", "stroke-linecap": "round", opacity: .8, class: "av-arc" }, sh);
+  el("path", { d: "M0 -54 L36 -40 V-8 C36 16 18 30 0 38 C-18 30 -36 16 -36 -8 V-40Z", fill: "url(#avShield)" }, sh);
+  el("path", { d: "M0 -14 c-4 -8 -18 -8 -18 4 c0 9 12 16 18 22 c6 -6 18 -13 18 -22 c0 -12 -14 -12 -18 -4z", fill: "#fff" }, sh);
+  // phone: policy issued
+  var ph = el("g", { transform: "translate(430 210)" });
+  el("rect", { width: 92, height: 168, rx: 14, fill: "#0f172a" }, ph);
+  el("rect", { x: 6, y: 14, width: 80, height: 140, rx: 8, fill: "#fff" }, ph);
+  el("text", { x: 46, y: 36, "text-anchor": "middle", class: "av-ph" }, ph, "LIFE COVER");
+  el("rect", { x: 14, y: 46, width: 64, height: 6, rx: 3, fill: "#e2e8f0" }, ph);
+  el("rect", { x: 14, y: 58, width: 46, height: 6, rx: 3, fill: "#e2e8f0" }, ph);
+  var phStatus = el("text", { x: 46, y: 92, "text-anchor": "middle", class: "av-phs" }, ph, "Buying…");
+  var phBtn = el("rect", { x: 14, y: 112, width: 64, height: 26, rx: 13, fill: "#2563eb" }, ph);
+  var phBtnTx = el("text", { x: 46, y: 129, "text-anchor": "middle", class: "av-phb" }, ph, "PAY");
+  var chips = [];
+  function chip(x, y, text, color) { chips.push([x, y, text, color]); }
+  chip(280, 444, "1 · A FAMILY BUYS LIFE COVER ONLINE", "#fcd34d");
+
+  // ---------- 2. AWS platform ----------
+  var cl = el("g", { transform: "translate(280 590)" });
+  el("path", { d: "M-210 60 a40 40 0 0 1 10 -78 a60 60 0 0 1 108 -40 a70 70 0 0 1 128 10 a52 52 0 0 1 74 50 a40 40 0 0 1 -12 58z", fill: "url(#avCloud)", stroke: "#93c5fd", "stroke-width": 2 }, cl);
+  el("text", { x: -180, y: -44, class: "av-small" }, cl, "AWS");
+  var pods = [], svcs = ["policy", "payments", "claims", "customer", "docs", "notify"];
+  svcs.forEach(function (n, i) {
+    var x = -150 + (i % 3) * 110, y = -36 + Math.floor(i / 3) * 52;
+    var g = el("g", { transform: "translate(" + x + " " + y + ")" }, cl);
+    el("rect", { width: 92, height: 38, rx: 8, fill: "#fff", stroke: "#bfdbfe" }, g);
+    el("polygon", { points: "18,8 26,12 26,22 18,26 10,22 10,12", fill: "#326ce5" }, g);
+    var led = el("circle", { cx: 82, cy: 10, r: 3.5, fill: "#22c55e" }, g);
+    el("text", { x: 34, y: 23, class: "av-pod" }, g, n);
+    pods.push({ g: g, led: led });
+  });
+  chip(280, 724, "2 · POLICIES & CLAIMS RUN ON AWS + KUBERNETES", "#93c5fd");
+
+  // ---------- 3. CI/CD pipeline ----------
+  var stages = ["CODE", "JENKINS", "DOCKER", "K8S", "AWS"], stX = [], pipeY = 800;
+  el("line", { x1: 60, y1: pipeY, x2: 500, y2: pipeY, stroke: "#cbd5e1", "stroke-width": 4, "stroke-linecap": "round" });
+  var pipeFill = el("line", { x1: 60, y1: pipeY, x2: 60, y2: pipeY, stroke: "#22c55e", "stroke-width": 4, "stroke-linecap": "round" });
+  var stEls = stages.map(function (n, i) {
+    var x = 60 + i * 110; stX.push(x);
+    var g = el("g", { transform: "translate(" + x + " " + pipeY + ")" });
+    var c = el("circle", { r: 15, fill: "#fff", stroke: "#94a3b8", "stroke-width": 3 }, g);
+    el("text", { y: 34, "text-anchor": "middle", class: "av-small" }, g, n);
+    return c;
+  });
+  var pkt = el("circle", { cx: 60, cy: pipeY, r: 8, fill: "url(#avGlow)" });
+  var buildTx = el("text", { x: 280, y: 860, "text-anchor": "middle", class: "av-build" }, null, "");
+  chip(280, 890, "3 · EVERY RELEASE SHIPS THROUGH JENKINS CI/CD", "#86efac");
+
+  // ---------- flows: phone → platform → shield ----------
+  function flow(id, d, blue, n, dur) {
+    el("path", { d: d, fill: "none", stroke: "#cbd5e1", "stroke-width": 3, "stroke-linecap": "round" });
+    var g = el("g", {});
+    el("path", { id: id, d: d, fill: "none", stroke: blue ? "#60a5fa" : "#facc15", "stroke-width": 2, "stroke-dasharray": "4 10", class: "fs-dash" }, g);
+    if (reduceMotion) return;
+    for (var i = 0; i < n; i++) {
+      var c = el("circle", { r: 6, fill: blue ? "url(#avGlowB)" : "url(#avGlow)" }, g);
+      var m = el("animateMotion", { dur: dur + "s", repeatCount: "indefinite", begin: (-i * dur / n).toFixed(2) + "s" }, c);
+      el("mpath", { href: "#" + id }, m);
+    }
+  }
+  flow("avf1", "M476 378 C476 470 420 500 380 540", true, 3, 1.8);     // policy request to the platform
+  flow("avf2", "M180 540 C140 480 200 300 262 260", false, 3, 2.2);    // cover confirmed back to the family
+  flow("avf3", "M500 800 C540 760 520 690 486 640", false, 2, 1.6);    // release deployed to AWS
+  chips.forEach(function (c) {
+    var g = el("g", { transform: "translate(" + c[0] + " " + c[1] + ")" });
+    var w = c[2].length * 6.7 + 26;
+    el("rect", { x: -w / 2, y: -13, width: w, height: 26, rx: 13, fill: "#fff", stroke: c[3] }, g);
+    el("text", { x: 0, y: 4.5, "text-anchor": "middle", class: "fs-chip" }, g, c[2]);
+  });
+
+  // ---------- platform health dashboard ----------
+  var dash = el("g", { transform: "translate(20 920)" });
+  el("rect", { width: 520, height: 168, rx: 14, fill: "#0f172a" }, dash);
+  el("text", { x: 18, y: 26, class: "fs-dtitle" }, dash, "PLATFORM HEALTH · PRODUCTION");
+  var pill = el("g", { transform: "translate(410 12)" }, dash);
+  var pillBg = el("rect", { width: 94, height: 22, rx: 11, fill: "#14532d" }, pill);
+  var pillTx = el("text", { x: 47, y: 15, "text-anchor": "middle", class: "fs-pill" }, pill, "HEALTHY");
+  var tiles = [["UPTIME", "%"], ["DEPLOYS", "/ month"], ["OPSGENIE", ""], ["SECURITY", "audit"]].map(function (t, i) {
+    var g = el("g", { transform: "translate(" + (18 + i * 124) + " 40)" }, dash);
+    el("rect", { width: 114, height: 46, rx: 8, fill: "#1e293b" }, g);
+    el("text", { x: 10, y: 16, class: "fs-tlabel" }, g, t[0]);
+    var v = el("text", { x: 10, y: 37, class: "fs-tval" }, g, "");
+    el("text", { x: 104, y: 37, "text-anchor": "end", class: "fs-tunit" }, g, t[1]);
+    return v;
+  });
+  el("text", { x: 18, y: 106, class: "fs-tlabel" }, dash, "ACTIVITY");
+  var logs = [0, 1].map(function (i) { return el("text", { x: 18, y: 128 + i * 22, class: "av-log" }, dash, ""); });
+
+  // ---------- simulation (illustrative numbers) ----------
+  var EVENTS = [
+    ["deploy", "Deploy #%n · policy-service · Jenkins → EKS ✓"],
+    ["alert", "Opsgenie P3 · claims-service latency · acknowledged"],
+    ["resolve", "Opsgenie P3 · resolved in 6 min"],
+    ["deploy", "Deploy #%n · payments-service · rolled out 3/3 pods ✓"],
+    ["audit", "Security audit · IAM & S3 checks passed ✓"],
+    ["deploy", "Deploy #%n · customer-portal · Terraform plan applied ✓"]
+  ];
+  var deployN = 140, monthDeploys = 37, alerts = 0, ev = 0, stage = -1, buildRunning = false, log = ["", ""], visible = true;
+  var policies = 0;
+  function runBuild(name) {
+    buildRunning = true; stage = 0;
+    stEls.forEach(function (c) { c.setAttribute("fill", "#fff"); c.setAttribute("stroke", "#94a3b8"); });
+    buildTx.textContent = "Building " + name + "…";
+    (function next() {
+      if (!visible) { setTimeout(next, 400); return; }
+      var x = stX[stage];
+      stEls[stage].setAttribute("fill", "#22c55e"); stEls[stage].setAttribute("stroke", "#15803d");
+      pkt.setAttribute("cx", x); pipeFill.setAttribute("x2", x);
+      if (stage < stages.length - 1) { stage++; setTimeout(next, reduceMotion ? 0 : 650); }
+      else { buildTx.textContent = name + " deployed to production ✓"; buildRunning = false; }
+    })();
+  }
+  function step() {
+    var e = EVENTS[ev % EVENTS.length]; ev++;
+    var text = e[1].replace("%n", deployN);
+    if (e[0] === "deploy") { deployN++; monthDeploys++; runBuild(text.split(" · ")[1]); }
+    if (e[0] === "alert") { alerts = 1; pods[2].led.setAttribute("fill", "#f59e0b"); }
+    if (e[0] === "resolve") { alerts = 0; pods[2].led.setAttribute("fill", "#22c55e"); }
+    log = [text, log[0]];
+    logs[0].textContent = log[0]; logs[1].textContent = log[1];
+    tiles[0].textContent = "99.9";
+    tiles[1].textContent = monthDeploys;
+    tiles[2].textContent = alerts ? "1 alert" : "0 alerts";
+    tiles[2].setAttribute("fill", alerts ? "#fbbf24" : "#fff");
+    tiles[3].textContent = "Passed";
+    pillTx.textContent = alerts ? "ALERT" : "HEALTHY";
+    pillBg.setAttribute("fill", alerts ? "#78350f" : "#14532d");
+    // the phone: a new policy is bought, then issued
+    policies++;
+    phStatus.textContent = "Policy #" + (24800 + policies) + " issued ✓";
+    phBtn.setAttribute("fill", "#16a34a"); phBtnTx.textContent = "COVERED";
+    setTimeout(function () { phStatus.textContent = "Buying…"; phBtn.setAttribute("fill", "#2563eb"); phBtnTx.textContent = "PAY"; }, 2200);
+  }
+  step();
+  if (!reduceMotion) setInterval(function () { if (visible) step(); }, 4200);
+  if ("IntersectionObserver" in window && !reduceMotion) {
+    new IntersectionObserver(function (en) {
+      visible = en[0].isIntersecting;
+      if (svg.pauseAnimations) visible ? svg.unpauseAnimations() : svg.pauseAnimations();
+    }).observe(svg);
+  }
+})();
