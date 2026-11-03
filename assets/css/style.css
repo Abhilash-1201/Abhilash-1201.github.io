@@ -471,6 +471,23 @@ main > section + section { border-top: 1px solid var(--line); }
 #proj-aviva .pf-visual { background: #fde68a; }
 #proj-fluence .pf-visual { background: #bfdbfe; }
 #proj-khushi .pf-visual { background: #fecdd3; }
+#proj-sensei .pf-visual { background: #c7d2fe; }
+.ss-code { font: 500 11.5px var(--mono); }
+.ss-small { font-size: 11px; font-weight: 700; fill: #3730a3; font-family: var(--mono); }
+.ss-title { font-size: 11px; font-weight: 800; letter-spacing: .12em; fill: #312e81; }
+.ss-stage { font-size: 11.5px; font-weight: 600; fill: #1e293b; font-family: var(--mono); }
+.ss-tag { font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+.ss-node { font-size: 11.5px; font-weight: 800; fill: #1e293b; }
+.ss-sub { font-size: 9.5px; font-weight: 700; letter-spacing: .1em; fill: #64748b; }
+.ss-sub.red { fill: #dc2626; } .ss-sub.green { fill: #15803d; } .ss-sub.blue { fill: #1d4ed8; }
+.ss-role { font-size: 11px; font-weight: 700; fill: #4c1d95; font-family: var(--mono); }
+.ss-res-t { font-size: 10.5px; font-weight: 700; fill: #1e293b; }
+.ss-tv { font-size: 16px !important; }
+.ss-res { opacity: .15; transition: opacity .35s ease; }
+.ss-res.on { opacity: 1; }
+.ss-run { animation: blink 1s steps(2, jump-none) infinite; }
+.ss-commit { transform-box: fill-box; transform-origin: 50% 100%; }
+.ss-commit.pop { animation: kbpop .5s cubic-bezier(.2,.8,.2,1.3); }
 .kb-ct { font-size: 9.5px; font-weight: 800; letter-spacing: .12em; fill: #be123c; }
 .kb-cl { font-size: 11px; font-weight: 600; fill: #334155; }
 .kb-card { transform-box: fill-box; transform-origin: 50% 100%; }
