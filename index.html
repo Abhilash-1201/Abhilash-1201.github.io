@@ -271,7 +271,7 @@
 <section class="experience wrap" id="experience">
   <h2 class="kicker">Experience</h2>
   <div class="rec-intro">
-    <h3 class="rec-title">My journey</h3>
+    <h3 class="rec-title caps">My Journey</h3>
     <p class="rec-sub">From Java developer to Senior Cloud Engineer, one milestone at a time. Then drive the road below through each milestone.</p>
   </div>
   <div class="journey" id="journey">
@@ -297,20 +297,103 @@
 
 <section class="work wrap" id="projects">
   <h2 class="big">Projects</h2>
-  <div class="projects">
-    <article class="project">
+  <article class="pf" id="proj-fluence">
+    <div class="pf-visual">
+      <svg class="pf-scene" viewBox="0 0 560 440" role="img" aria-label="Wind turbines and solar panels generate power, battery storage containers charge, and the stored energy is sold into the grid and electricity markets.">
+          <defs>
+            <linearGradient id="flSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dbeafe"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
+            <linearGradient id="flHill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bbf7d0"/><stop offset="1" stop-color="#86efac"/></linearGradient>
+            <linearGradient id="flTower" x1="0" x2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cbd5e1"/></linearGradient>
+            <linearGradient id="flBox" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e2e8f0"/></linearGradient>
+            <g id="flRotor"><circle r="5" fill="#e2e8f0" stroke="#94a3b8"/><path d="M0 -4 C4 -20 3 -44 0 -56 C-3 -44 -4 -20 0 -4Z" fill="#fff" stroke="#94a3b8" stroke-width="1"/><path d="M0 -4 C4 -20 3 -44 0 -56 C-3 -44 -4 -20 0 -4Z" fill="#fff" stroke="#94a3b8" stroke-width="1" transform="rotate(120)"/><path d="M0 -4 C4 -20 3 -44 0 -56 C-3 -44 -4 -20 0 -4Z" fill="#fff" stroke="#94a3b8" stroke-width="1" transform="rotate(240)"/></g>
+          </defs>
+          <rect width="560" height="440" fill="url(#flSky)"/>
+          <circle cx="470" cy="70" r="26" fill="#fde68a" opacity=".85"/>
+          <path d="M0 300 C110 262 210 282 300 300 C390 318 470 290 560 296 V440 H0Z" fill="url(#flHill)"/>
+          <path d="M0 340 C140 320 260 344 380 336 C460 330 520 340 560 338 V440 H0Z" fill="#4ade80" opacity=".35"/>
+
+          <!-- wind turbines -->
+          <g class="fl-turbine"><polygon points="86,300 94,300 92,150 88,150" fill="url(#flTower)"/><rect x="83" y="144" width="18" height="9" rx="4" fill="#e2e8f0" stroke="#94a3b8"/>
+            <g transform="translate(90 148)"><g><use href="#flRotor"/><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="4s" repeatCount="indefinite"/></g></g></g>
+          <g class="fl-turbine" transform="translate(150 22) scale(.82)"><polygon points="86,300 94,300 92,150 88,150" fill="url(#flTower)"/><rect x="83" y="144" width="18" height="9" rx="4" fill="#e2e8f0" stroke="#94a3b8"/>
+            <g transform="translate(90 148)"><g><use href="#flRotor"/><animateTransform attributeName="transform" type="rotate" from="40" to="400" dur="3.4s" repeatCount="indefinite"/></g></g></g>
+          <g class="fl-turbine" transform="translate(270 112) scale(.5)"><polygon points="86,300 94,300 92,150 88,150" fill="url(#flTower)"/><rect x="83" y="144" width="18" height="9" rx="4" fill="#e2e8f0" stroke="#94a3b8"/>
+            <g transform="translate(90 148)"><g><use href="#flRotor"/><animateTransform attributeName="transform" type="rotate" from="80" to="440" dur="5s" repeatCount="indefinite"/></g></g></g>
+          <!-- solar panels -->
+          <g transform="translate(40 330)">
+            <g fill="#1e3a8a" stroke="#93c5fd" stroke-width="1"><polygon points="0,30 40,30 52,8 12,8"/><polygon points="56,30 96,30 108,8 68,8"/></g>
+            <g stroke="#93c5fd" stroke-width=".8" opacity=".8"><line x1="6" y1="19" x2="46" y2="19"/><line x1="62" y1="19" x2="102" y2="19"/><line x1="26" y1="8" x2="20" y2="30"/><line x1="82" y1="8" x2="76" y2="30"/></g>
+            <g fill="#64748b"><rect x="24" y="30" width="3" height="10"/><rect x="80" y="30" width="3" height="10"/></g>
+          </g>
+          <text x="96" y="410" class="fl-label" text-anchor="middle">WIND &amp; SOLAR</text>
+
+          <!-- energy flowing to the batteries -->
+          <path id="flWire1" d="M100 300 C150 300 190 318 236 318" fill="none" stroke="#cbd5e1" stroke-width="3"/>
+          <path d="M100 300 C150 300 190 318 236 318" fill="none" stroke="#22c55e" stroke-width="3" stroke-dasharray="6 10" class="fl-flow"/>
+          <path d="M150 345 C190 345 210 334 236 334" fill="none" stroke="#cbd5e1" stroke-width="3"/>
+          <path d="M150 345 C190 345 210 334 236 334" fill="none" stroke="#22c55e" stroke-width="3" stroke-dasharray="6 10" class="fl-flow"/>
+
+          <!-- battery storage containers -->
+          <g transform="translate(236 278)">
+            <g class="fl-box"><rect width="66" height="78" rx="4" fill="url(#flBox)" stroke="#94a3b8"/><rect x="0" y="0" width="66" height="10" rx="3" fill="#0f766e"/>
+              <rect x="10" y="20" width="12" height="48" rx="2" fill="#e2e8f0"/><rect x="10" y="20" width="12" height="48" rx="2" fill="#22c55e" class="fl-charge"/>
+              <rect x="27" y="20" width="12" height="48" rx="2" fill="#e2e8f0"/><rect x="27" y="20" width="12" height="48" rx="2" fill="#22c55e" class="fl-charge c2"/>
+              <rect x="44" y="20" width="12" height="48" rx="2" fill="#e2e8f0"/><rect x="44" y="20" width="12" height="48" rx="2" fill="#22c55e" class="fl-charge c3"/></g>
+            <g class="fl-box" transform="translate(72 0)"><rect width="66" height="78" rx="4" fill="url(#flBox)" stroke="#94a3b8"/><rect x="0" y="0" width="66" height="10" rx="3" fill="#0f766e"/>
+              <rect x="10" y="20" width="12" height="48" rx="2" fill="#e2e8f0"/><rect x="10" y="20" width="12" height="48" rx="2" fill="#22c55e" class="fl-charge c3"/>
+              <rect x="27" y="20" width="12" height="48" rx="2" fill="#e2e8f0"/><rect x="27" y="20" width="12" height="48" rx="2" fill="#22c55e" class="fl-charge"/>
+              <rect x="44" y="20" width="12" height="48" rx="2" fill="#e2e8f0"/><rect x="44" y="20" width="12" height="48" rx="2" fill="#22c55e" class="fl-charge c2"/></g>
+            <path d="M58 -14 l-8 14 h7 l-5 12 l12 -16 h-7 l6 -10z" fill="#facc15" class="fl-bolt"/>
+          </g>
+          <text x="305" y="410" class="fl-label" text-anchor="middle">BATTERY STORAGE</text>
+
+          <!-- to the grid and the market -->
+          <path d="M374 318 C410 318 420 300 452 296" fill="none" stroke="#cbd5e1" stroke-width="3"/>
+          <path d="M374 318 C410 318 420 300 452 296" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="6 10" class="fl-flow"/>
+          <g transform="translate(470 230)" stroke="#64748b" stroke-width="2.4" fill="none" stroke-linejoin="round">
+            <path d="M0 126 L14 0 L28 126 M3 98 H25 M6 70 H22 M9 42 H19 M-14 30 H42 M-8 14 H36"/><path d="M3 98 L22 70 M25 98 L6 70 M6 70 L19 42 M22 70 L9 42"/>
+          </g>
+          <!-- market price panel (Mosaic bids into the market) -->
+          <g transform="translate(392 112)">
+            <rect width="150" height="96" rx="10" fill="#0f172a"/>
+            <text x="12" y="20" class="fl-panel">MOSAIC · MARKET BIDS</text>
+            <polyline points="12,78 32,66 52,72 72,48 92,56 112,34 138,40" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linejoin="round" class="fl-line"/>
+            <circle cx="138" cy="40" r="4" fill="#22c55e" class="fl-dot"/>
+            <text x="12" y="92" class="fl-panel dim">CAISO · ERCOT · NEM</text>
+          </g>
+          <text x="470" y="410" class="fl-label" text-anchor="middle">GRID &amp; MARKETS</text>
+        </svg>
+    </div>
+    <div class="pf-text">
       <p class="p-meta">Fluence Energy <span>Oct 2023 – Present</span></p>
       <h3>Mosaic platform</h3>
       <p class="p-role">Cloud &amp; DevOps Engineer</p>
-      <ul class="points">
-        <li>Provision and maintain multi-environment infrastructure in Terraform, with plan and apply automated through Atlantis.</li>
-        <li>Operate Amazon EKS clusters: Kubernetes version upgrades, node group updates, scaling and troubleshooting.</li>
-        <li>Deliver Kubernetes deployments through GitOps with Argo CD.</li>
-        <li>Build CircleCI pipelines covering builds, tests, security scans, image builds and multi-environment deploys.</li>
-        <li>Set up Datadog dashboards, log pipelines and alerting, and work the alerts when they fire.</li>
-      </ul>
+      <div class="pf-block">
+        <h4>About Fluence</h4>
+        <p>Fluence builds grid-scale battery energy storage and the software that runs it. Wind and solar farms produce power when the weather allows; Fluence storage systems hold that energy and release it when the grid needs it.</p>
+        <p>Its <b>Mosaic</b> software decides when those batteries and renewable plants buy and sell power, bidding them into wholesale electricity markets such as CAISO (California), ERCOT (Texas) and Australia's NEM. Mosaic manages more than 13 GW of assets.</p>
+      </div>
+      <div class="pf-block">
+        <h4>The project</h4>
+        <p>I run the AWS infrastructure, Kubernetes workloads, delivery pipelines and monitoring behind the Mosaic platform, across multiple environments.</p>
+      </div>
+      <div class="pf-block">
+        <h4>My roles &amp; responsibilities</h4>
+        <ul class="points">
+          <li>Provision and maintain multi-environment infrastructure in Terraform, with plan and apply automated through Atlantis.</li>
+          <li>Operate Amazon EKS clusters: Kubernetes version upgrades, node group updates, scaling and troubleshooting.</li>
+          <li>Deliver Kubernetes deployments through GitOps with Argo CD.</li>
+          <li>Build CircleCI pipelines covering builds, tests, security scans, image builds and multi-environment deploys.</li>
+          <li>Set up Datadog dashboards, log pipelines and alerting, and work the alerts when they fire.</li>
+          <li>Manage Okta provisioning and access for internal applications.</li>
+        </ul>
+      </div>
+      <ul class="tags" aria-label="Stack"><li>AWS</li><li>Terraform</li><li>Atlantis</li><li>EKS</li><li>Kubernetes</li><li>Docker</li><li>ECR</li><li>CircleCI</li><li>Argo CD</li><li>Datadog</li><li>Okta</li></ul>
       <p class="outcome"><b>Outcome</b> More consistent infrastructure through Terraform, smoother Kubernetes releases through CI/CD and GitOps, and better visibility through Datadog.</p>
-    </article>
+      <a class="pf-link" href="https://fluenceenergy.com/energy-storage-technology/" target="_blank" rel="noopener">About Fluence's energy storage <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    </div>
+  </article>
+  <div class="projects">
     <article class="project">
       <p class="p-meta">Sensei Technologies</p>
       <h3>AWS infrastructure automation with Terraform</h3>
