@@ -297,6 +297,103 @@
 
 <section class="work wrap" id="projects">
   <h2 class="big">Projects</h2>
+  <article class="pf" id="proj-sensei">
+    <div class="pf-visual">
+      <svg class="pf-scene" id="ssScene" viewBox="0 0 560 1100" preserveAspectRatio="xMidYMax slice" role="img" aria-label="A Terraform change is pushed; GitLab CI runs init, validate, plan and apply; the runner signs in to AWS through OIDC and STS with separate Plan and Apply roles and no stored keys; Terraform then builds a VPC with public and private subnets, gateways, ECS, ECR and KMS encryption, with state in S3."></svg>
+    </div>
+    <div class="pf-text">
+      <p class="p-meta">Sensei Technologies <span>Jan 2026 – Present</span></p>
+      <h3>Secure AWS infrastructure automation</h3>
+      <p class="p-role">Senior DevOps Engineer</p>
+      <div class="pf-block">
+        <h4>About Sensei</h4>
+        <p>Sen-Sei Technologies is a Bengaluru software company, founded in 2007, that provides solution design, web and mobile app development and application integration, and builds products such as a P2P lending platform and a hospital management system (HMIS).</p>
+      </div>
+      <div class="pf-block">
+        <h4>The project</h4>
+        <p>Designing, provisioning and managing secure, scalable AWS infrastructure with Terraform, deployed through GitLab CI/CD pipelines that authenticate to AWS with <b>OpenID Connect</b> instead of stored access keys.</p>
+      </div>
+      <div class="pf-block">
+        <h4>My roles &amp; responsibilities</h4>
+        <div class="role-groups">
+          <div class="rg"><h5>Infrastructure as Code &amp; networking</h5><ul class="points"><li>Designed and implemented AWS infrastructure in Terraform using IaC best practices and a modular architecture.</li><li>Provisioned VPCs, public and private subnets, Internet Gateway, NAT Gateway, route tables and security groups.</li><li>Configured Terraform remote state in Amazon S3 with state locking for collaborative infrastructure management.</li></ul></div>
+          <div class="rg"><h5>GitLab CI/CD with OIDC</h5><ul class="points"><li>Built GitLab CI/CD pipelines that automate Terraform init, validate, plan and apply.</li><li>Integrated GitLab with AWS through OpenID Connect, removing long-lived AWS access keys; configured the IAM OIDC identity provider and its trust relationships.</li></ul></div>
+          <div class="rg"><h5>IAM &amp; least privilege</h5><ul class="points"><li>Created dedicated IAM roles for Terraform Bootstrap, Plan and Apply to separate duties.</li><li>Wrote custom IAM and trust policies to restrict unauthorized infrastructure operations, plus restricted iam:PassRole for ECS workloads.</li></ul></div>
+          <div class="rg"><h5>Containers on ECS</h5><ul class="points"><li>Implemented Amazon ECS and ECR infrastructure for containerized deployments.</li><li>Split ECS Task Execution and Task roles so container execution permissions stay separate from application runtime permissions.</li></ul></div>
+          <div class="rg"><h5>Encryption &amp; troubleshooting</h5><ul class="points"><li>Worked on AWS KMS encryption permissions for resource provisioning and encryption operations.</li><li>Resolved Terraform deployment failures, IAM AccessDenied errors, OIDC authentication issues and resource dependency problems, following AWS security best practices throughout.</li></ul></div>
+        </div>
+      </div>
+      <ul class="tags" aria-label="Stack"><li>AWS</li><li>Terraform</li><li>GitLab CI/CD</li><li>Git</li><li>Docker</li><li>Amazon ECS</li><li>Amazon ECR</li><li>IAM</li><li>OIDC</li><li>STS</li><li>VPC</li><li>S3</li><li>KMS</li><li>Bash</li></ul>
+      <p class="outcome"><b>Outcome</b> Repeatable, modular AWS provisioning and a key-free, least-privilege deployment pipeline.</p>
+      <a class="pf-link" href="https://www.sen-sei.in/index.html" target="_blank" rel="noopener">About Sensei Technologies <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    </div>
+  </article>
+  <article class="pf" id="proj-khushi">
+    <div class="pf-visual">
+      <svg class="pf-scene" id="kbScene" viewBox="0 0 560 1100" preserveAspectRatio="xMidYMax slice" role="img" aria-label="A community health worker records care for a mother and baby on a phone; the data reaches the CHIP platform running in three state datacenters and on AWS with Kubernetes; a magnifying glass scans each layer while seven assessment areas are ticked off, and a dashboard shows the assessment progress."></svg>
+    </div>
+    <div class="pf-text">
+      <p class="p-meta">Khushi Baby <span>Sep 2024 – Dec 2025</span></p>
+      <h3>DevOps, Kubernetes &amp; security assessment</h3>
+      <p class="p-role">Cloud &amp; DevOps Consultant</p>
+      <div class="pf-block">
+        <h4>About Khushi Baby</h4>
+        <p>Khushi Baby is a digital health nonprofit that works with state governments in India to turn health data into action. Its <b>CHIP</b> platform is used by more than 85,000 community health workers to record care in the field, and holds longitudinal health records for over 60 million people across Rajasthan, Maharashtra and Karnataka.</p>
+      </div>
+      <div class="pf-block">
+        <h4>The project</h4>
+        <p>An end-to-end assessment of the on-premises and hybrid infrastructure behind the platform, across three state datacenters and AWS, covering infrastructure, Kubernetes, CI/CD, monitoring, security and disaster recovery, ending in a detailed report and improvement roadmap.</p>
+      </div>
+      <div class="pf-block">
+        <h4>My roles &amp; responsibilities</h4>
+        <div class="role-groups">
+          <div class="rg"><h5>Infrastructure &amp; cloud</h5><ul class="points"><li>Assessed on-premises and hybrid infrastructure (VMs, storage, networking, compute) across the Karnataka, Maharashtra and Rajasthan datacenters.</li><li>Reviewed the AWS setup, environment separation, availability and scalability, and identified automation and optimization opportunities.</li></ul></div>
+          <div class="rg"><h5>Kubernetes &amp; containers</h5><ul class="points"><li>Assessed cluster architecture (control plane, worker nodes, namespaces, workloads), resource utilization, pod health and deployment strategies.</li><li>Evaluated supporting components: NGINX Ingress, HAProxy, Redis, RabbitMQ and OpenEBS.</li></ul></div>
+          <div class="rg"><h5>CI/CD &amp; IaC</h5><ul class="points"><li>Reviewed GitHub branching, pull request flow, branch protection and GitHub Actions workflows.</li><li>Identified manual deployment steps to automate and where Terraform should take over infrastructure provisioning.</li></ul></div>
+          <div class="rg"><h5>Monitoring &amp; observability</h5><ul class="points"><li>Evaluated New Relic, Prometheus and CloudWatch across infrastructure, Kubernetes, application and database monitoring.</li><li>Reviewed CPU, memory, disk, pod-health and availability alerts; recommended centralized logging, alerting and APM.</li></ul></div>
+          <div class="rg"><h5>DevSecOps &amp; security</h5><ul class="points"><li>Assessed secrets management, access controls and vulnerability scanning across infrastructure, Kubernetes and CI/CD, and recommended fixes for the gaps.</li></ul></div>
+          <div class="rg"><h5>Backup &amp; disaster recovery</h5><ul class="points"><li>Evaluated backup strategy, database backups and DR practices; flagged gaps in backup validation and DR documentation and recommended resilience improvements.</li></ul></div>
+          <div class="rg"><h5>Reporting &amp; roadmap</h5><ul class="points"><li>Worked with infrastructure and application teams, wrote the assessment report, identified DevOps maturity gaps and contributed to the roadmap for automation, security, monitoring and modernization.</li></ul></div>
+        </div>
+      </div>
+      <ul class="tags" aria-label="Stack"><li>Kubernetes</li><li>Docker</li><li>AWS</li><li>Terraform</li><li>GitHub Actions</li><li>New Relic</li><li>Prometheus</li><li>CloudWatch</li><li>NGINX Ingress</li><li>HAProxy</li><li>Redis</li><li>RabbitMQ</li><li>OpenEBS</li></ul>
+      <p class="outcome"><b>Outcome</b> A clear picture of reliability, DevOps maturity, security and resilience across all three states, with an actionable roadmap to improve them.</p>
+      <a class="pf-link" href="https://www.khushibaby.org/" target="_blank" rel="noopener">About Khushi Baby <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    </div>
+  </article>
+  <article class="pf" id="proj-fluence">
+    <div class="pf-visual">
+      <svg class="pf-scene" id="flScene" viewBox="0 0 560 1100" preserveAspectRatio="xMidYMax slice" role="img" aria-label="A wind and solar farm generates power, an inverter charges a yard of battery containers, and the stored energy is sold to the grid when prices are high. A live Mosaic-style dashboard shows wind and solar output, battery charge and the market price."></svg>
+    </div>
+    <div class="pf-text">
+      <p class="p-meta">Fluence Energy <span>Jun 2022 – Aug 2024</span></p>
+      <h3>Mosaic platform</h3>
+      <p class="p-role">Cloud &amp; DevOps Engineer</p>
+      <div class="pf-block">
+        <h4>About Fluence</h4>
+        <p>Fluence builds grid-scale battery energy storage and the software that runs it. Wind and solar farms produce power when the weather allows; Fluence storage systems hold that energy and release it when the grid needs it.</p>
+        <p>Its <b>Mosaic</b> software decides when those batteries and renewable plants buy and sell power, bidding them into wholesale electricity markets such as CAISO (California), ERCOT (Texas) and Australia's NEM. Mosaic manages more than 13 GW of assets.</p>
+      </div>
+      <div class="pf-block">
+        <h4>The project</h4>
+        <p>I run the AWS infrastructure, Kubernetes workloads, delivery pipelines and monitoring behind the Mosaic platform, across multiple environments.</p>
+      </div>
+      <div class="pf-block">
+        <h4>My roles &amp; responsibilities</h4>
+        <ul class="points">
+          <li>Provision and maintain multi-environment infrastructure in Terraform, with plan and apply automated through Atlantis.</li>
+          <li>Operate Amazon EKS clusters: Kubernetes version upgrades, node group updates, scaling and troubleshooting.</li>
+          <li>Deliver Kubernetes deployments through GitOps with Argo CD.</li>
+          <li>Build CircleCI pipelines covering builds, tests, security scans, image builds and multi-environment deploys.</li>
+          <li>Set up Datadog dashboards, log pipelines and alerting, and work the alerts when they fire.</li>
+          <li>Manage Okta provisioning and access for internal applications.</li>
+        </ul>
+      </div>
+      <ul class="tags" aria-label="Stack"><li>AWS</li><li>Terraform</li><li>Atlantis</li><li>EKS</li><li>Kubernetes</li><li>Docker</li><li>ECR</li><li>CircleCI</li><li>Argo CD</li><li>Datadog</li><li>Okta</li></ul>
+      <p class="outcome"><b>Outcome</b> More consistent infrastructure through Terraform, smoother Kubernetes releases through CI/CD and GitOps, and better visibility through Datadog.</p>
+      <a class="pf-link" href="https://fluenceenergy.com/energy-storage-technology/" target="_blank" rel="noopener">About Fluence's energy storage <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    </div>
+  </article>
   <article class="pf" id="proj-aviva">
     <div class="pf-visual">
       <svg class="pf-scene" id="avScene" viewBox="0 0 560 1100" preserveAspectRatio="xMidYMax slice" role="img" aria-label="A family buys life cover on a phone; the policy and claims services run on AWS and Kubernetes; each release ships through a Jenkins CI/CD pipeline; a health dashboard shows uptime, deployments, Opsgenie alerts and the security audit."></svg>
@@ -332,86 +429,6 @@
       <a class="pf-link" href="https://www.avivaindia.com/" target="_blank" rel="noopener">About Aviva India <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
     </div>
   </article>
-  <article class="pf" id="proj-fluence">
-    <div class="pf-visual">
-      <svg class="pf-scene" id="flScene" viewBox="0 0 560 1100" preserveAspectRatio="xMidYMax slice" role="img" aria-label="A wind and solar farm generates power, an inverter charges a yard of battery containers, and the stored energy is sold to the grid when prices are high. A live Mosaic-style dashboard shows wind and solar output, battery charge and the market price."></svg>
-    </div>
-    <div class="pf-text">
-      <p class="p-meta">Fluence Energy <span>Jun 2022 – Sep 2023</span></p>
-      <h3>Mosaic platform</h3>
-      <p class="p-role">Cloud &amp; DevOps Engineer</p>
-      <div class="pf-block">
-        <h4>About Fluence</h4>
-        <p>Fluence builds grid-scale battery energy storage and the software that runs it. Wind and solar farms produce power when the weather allows; Fluence storage systems hold that energy and release it when the grid needs it.</p>
-        <p>Its <b>Mosaic</b> software decides when those batteries and renewable plants buy and sell power, bidding them into wholesale electricity markets such as CAISO (California), ERCOT (Texas) and Australia's NEM. Mosaic manages more than 13 GW of assets.</p>
-      </div>
-      <div class="pf-block">
-        <h4>The project</h4>
-        <p>I run the AWS infrastructure, Kubernetes workloads, delivery pipelines and monitoring behind the Mosaic platform, across multiple environments.</p>
-      </div>
-      <div class="pf-block">
-        <h4>My roles &amp; responsibilities</h4>
-        <ul class="points">
-          <li>Provision and maintain multi-environment infrastructure in Terraform, with plan and apply automated through Atlantis.</li>
-          <li>Operate Amazon EKS clusters: Kubernetes version upgrades, node group updates, scaling and troubleshooting.</li>
-          <li>Deliver Kubernetes deployments through GitOps with Argo CD.</li>
-          <li>Build CircleCI pipelines covering builds, tests, security scans, image builds and multi-environment deploys.</li>
-          <li>Set up Datadog dashboards, log pipelines and alerting, and work the alerts when they fire.</li>
-          <li>Manage Okta provisioning and access for internal applications.</li>
-        </ul>
-      </div>
-      <ul class="tags" aria-label="Stack"><li>AWS</li><li>Terraform</li><li>Atlantis</li><li>EKS</li><li>Kubernetes</li><li>Docker</li><li>ECR</li><li>CircleCI</li><li>Argo CD</li><li>Datadog</li><li>Okta</li></ul>
-      <p class="outcome"><b>Outcome</b> More consistent infrastructure through Terraform, smoother Kubernetes releases through CI/CD and GitOps, and better visibility through Datadog.</p>
-      <a class="pf-link" href="https://fluenceenergy.com/energy-storage-technology/" target="_blank" rel="noopener">About Fluence's energy storage <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
-    </div>
-  </article>
-  <article class="pf" id="proj-khushi">
-    <div class="pf-visual">
-      <svg class="pf-scene" id="kbScene" viewBox="0 0 560 1100" preserveAspectRatio="xMidYMax slice" role="img" aria-label="A community health worker records care for a mother and baby on a phone; the data reaches the CHIP platform running in three state datacenters and on AWS with Kubernetes; a magnifying glass scans each layer while seven assessment areas are ticked off, and a dashboard shows the assessment progress."></svg>
-    </div>
-    <div class="pf-text">
-      <p class="p-meta">Khushi Baby <span>Oct 2023 – Nov 2024</span></p>
-      <h3>DevOps, Kubernetes &amp; security assessment</h3>
-      <p class="p-role">Cloud &amp; DevOps Consultant</p>
-      <div class="pf-block">
-        <h4>About Khushi Baby</h4>
-        <p>Khushi Baby is a digital health nonprofit that works with state governments in India to turn health data into action. Its <b>CHIP</b> platform is used by more than 85,000 community health workers to record care in the field, and holds longitudinal health records for over 60 million people across Rajasthan, Maharashtra and Karnataka.</p>
-      </div>
-      <div class="pf-block">
-        <h4>The project</h4>
-        <p>An end-to-end assessment of the on-premises and hybrid infrastructure behind the platform, across three state datacenters and AWS, covering infrastructure, Kubernetes, CI/CD, monitoring, security and disaster recovery, ending in a detailed report and improvement roadmap.</p>
-      </div>
-      <div class="pf-block">
-        <h4>My roles &amp; responsibilities</h4>
-        <div class="role-groups">
-          <div class="rg"><h5>Infrastructure &amp; cloud</h5><ul class="points"><li>Assessed on-premises and hybrid infrastructure (VMs, storage, networking, compute) across the Karnataka, Maharashtra and Rajasthan datacenters.</li><li>Reviewed the AWS setup, environment separation, availability and scalability, and identified automation and optimization opportunities.</li></ul></div>
-          <div class="rg"><h5>Kubernetes &amp; containers</h5><ul class="points"><li>Assessed cluster architecture (control plane, worker nodes, namespaces, workloads), resource utilization, pod health and deployment strategies.</li><li>Evaluated supporting components: NGINX Ingress, HAProxy, Redis, RabbitMQ and OpenEBS.</li></ul></div>
-          <div class="rg"><h5>CI/CD &amp; IaC</h5><ul class="points"><li>Reviewed GitHub branching, pull request flow, branch protection and GitHub Actions workflows.</li><li>Identified manual deployment steps to automate and where Terraform should take over infrastructure provisioning.</li></ul></div>
-          <div class="rg"><h5>Monitoring &amp; observability</h5><ul class="points"><li>Evaluated New Relic, Prometheus and CloudWatch across infrastructure, Kubernetes, application and database monitoring.</li><li>Reviewed CPU, memory, disk, pod-health and availability alerts; recommended centralized logging, alerting and APM.</li></ul></div>
-          <div class="rg"><h5>DevSecOps &amp; security</h5><ul class="points"><li>Assessed secrets management, access controls and vulnerability scanning across infrastructure, Kubernetes and CI/CD, and recommended fixes for the gaps.</li></ul></div>
-          <div class="rg"><h5>Backup &amp; disaster recovery</h5><ul class="points"><li>Evaluated backup strategy, database backups and DR practices; flagged gaps in backup validation and DR documentation and recommended resilience improvements.</li></ul></div>
-          <div class="rg"><h5>Reporting &amp; roadmap</h5><ul class="points"><li>Worked with infrastructure and application teams, wrote the assessment report, identified DevOps maturity gaps and contributed to the roadmap for automation, security, monitoring and modernization.</li></ul></div>
-        </div>
-      </div>
-      <ul class="tags" aria-label="Stack"><li>Kubernetes</li><li>Docker</li><li>AWS</li><li>Terraform</li><li>GitHub Actions</li><li>New Relic</li><li>Prometheus</li><li>CloudWatch</li><li>NGINX Ingress</li><li>HAProxy</li><li>Redis</li><li>RabbitMQ</li><li>OpenEBS</li></ul>
-      <p class="outcome"><b>Outcome</b> A clear picture of reliability, DevOps maturity, security and resilience across all three states, with an actionable roadmap to improve them.</p>
-      <a class="pf-link" href="https://www.khushibaby.org/" target="_blank" rel="noopener">About Khushi Baby <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
-    </div>
-  </article>
-  <div class="projects">
-    <article class="project">
-      <p class="p-meta">Sensei Technologies</p>
-      <h3>AWS infrastructure automation with Terraform</h3>
-      <p class="p-role">Senior DevOps Engineer</p>
-      <ul class="points">
-        <li>Wrote the Terraform for the VPC, ECS cluster, ECR repositories and supporting AWS resources.</li>
-        <li>Replaced long-lived AWS access keys with GitLab OIDC, so pipelines authenticate with short-lived credentials.</li>
-        <li>Split IAM into separate least-privilege roles for Terraform plan, Terraform apply, ECS task execution and application runtime.</li>
-        <li>Set up the GitLab CI/CD workflows that run Terraform deployments.</li>
-      </ul>
-      <p class="outcome"><b>Outcome</b> Repeatable AWS provisioning and a key-free, automation-driven deployment workflow for the POC.</p>
-    </article>
-  </div>
 </section>
 
 <section class="skills wrap" id="skills">

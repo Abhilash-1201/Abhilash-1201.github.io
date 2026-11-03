@@ -593,3 +593,210 @@
     }).observe(svg);
   }
 })();
+
+/* Projects: the Sensei scene. A Terraform change is pushed; GitLab CI runs init → validate → plan → apply;
+   the runner signs in to AWS through OIDC (no stored keys) and assumes the Plan or Apply role through STS;
+   Terraform then builds the VPC, subnets, gateways, ECS and ECR, with state in S3 and encryption via KMS. */
+(function () {
+  "use strict";
+  var svg = document.getElementById("ssScene");
+  if (!svg) return;
+  var NS = "http://www.w3.org/2000/svg";
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function el(tag, attrs, parent, text) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    (parent || svg).appendChild(n);
+    return n;
+  }
+  el("defs").innerHTML =
+    '<linearGradient id="ssSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c7d2fe"/><stop offset="1" stop-color="#eef2ff"/></linearGradient>' +
+    '<radialGradient id="ssGlow"><stop offset="0" stop-color="#f5f3ff"/><stop offset=".4" stop-color="#8b5cf6"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></radialGradient>';
+  el("rect", { width: 560, height: 1100, fill: "#f8fafc" });
+  el("rect", { width: 560, height: 470, fill: "url(#ssSky)" });
+
+  var chips = [];
+  function chip(x, y, text, color) { chips.push([x, y, text, color]); }
+
+  // ---------- 1. laptop with Terraform + GitLab pipeline ----------
+  var lap = el("g", { transform: "translate(30 150)" });
+  el("rect", { width: 220, height: 140, rx: 10, fill: "#0f172a" }, lap);
+  el("rect", { x: 8, y: 8, width: 204, height: 124, rx: 6, fill: "#111827" }, lap);
+  [["module ", "#c084fc", "\"vpc\" {"], ["  cidr = ", "#94a3b8", "\"10.0.0.0/16\""], ["  azs  = ", "#94a3b8", "2"], ["}", "#e2e8f0", ""], ["backend ", "#c084fc", "\"s3\" {"], ["  encrypt = ", "#94a3b8", "true"]].forEach(function (l, i) {
+    var t = el("text", { x: 18, y: 30 + i * 17, class: "ss-code" }, lap);
+    el("tspan", { fill: l[1] }, t, l[0]); el("tspan", { fill: "#86efac" }, t, l[2]);
+  });
+  el("path", { d: "M-14 140 h248 l-12 14 h-224z", fill: "#cbd5e1" }, lap);
+  var commit = el("g", { transform: "translate(30 112)", class: "ss-commit" });
+  el("rect", { width: 150, height: 26, rx: 13, fill: "#fff", stroke: "#a5b4fc" }, commit);
+  el("text", { x: 75, y: 17.5, "text-anchor": "middle", class: "ss-small" }, commit, "git push · main");
+
+  var pipe = el("g", { transform: "translate(300 110)" });
+  el("rect", { width: 236, height: 214, rx: 12, fill: "#fff", stroke: "#c7d2fe" }, pipe);
+  el("text", { x: 16, y: 26, class: "ss-title" }, pipe, "GITLAB CI/CD · main");
+  var STAGES = ["terraform init", "terraform validate", "terraform plan", "terraform apply"];
+  var stDots = STAGES.map(function (s, i) {
+    var g = el("g", { transform: "translate(16 " + (48 + i * 40) + ")" }, pipe);
+    el("rect", { width: 204, height: 30, rx: 8, fill: "#f8fafc", stroke: "#e2e8f0" }, g);
+    var d = el("circle", { cx: 16, cy: 15, r: 7, fill: "#e2e8f0" }, g);
+    el("text", { x: 32, y: 19.5, class: "ss-stage" }, g, s);
+    var tag = el("text", { x: 194, y: 19.5, "text-anchor": "end", class: "ss-tag" }, g, "");
+    return { d: d, tag: tag };
+  });
+  chip(280, 440, "1 · GITLAB CI RUNS TERRAFORM ON EVERY CHANGE", "#a5b4fc");
+
+  // ---------- 2. OIDC: no stored keys ----------
+  var NODES = [["GitLab runner", "OIDC token", 76], ["IAM OIDC", "provider", 212], ["AWS STS", "AssumeRole", 348], ["Temp creds", "expire in 1h", 484]];
+  var nodeEls = NODES.map(function (n) {
+    var g = el("g", { transform: "translate(" + n[2] + " 508)" });
+    var b = el("rect", { x: -58, y: -24, width: 116, height: 48, rx: 10, fill: "#fff", stroke: "#cbd5e1" }, g);
+    el("text", { y: -3, "text-anchor": "middle", class: "ss-node" }, g, n[0]);
+    el("text", { y: 13, "text-anchor": "middle", class: "ss-sub" }, g, n[1]);
+    return b;
+  });
+  var token = el("circle", { cx: 76, cy: 508, r: 8, fill: "url(#ssGlow)" });
+  var ROLES = ["Bootstrap", "Plan", "Apply"];
+  el("text", { x: 280, y: 566, "text-anchor": "middle", class: "ss-sub" }, null, "SEPARATE LEAST-PRIVILEGE IAM ROLES");
+  var roleEls = ROLES.map(function (r, i) {
+    var g = el("g", { transform: "translate(" + (130 + i * 150) + " 592)" });
+    var b = el("rect", { x: -56, y: -15, width: 112, height: 30, rx: 15, fill: "#fff", stroke: "#cbd5e1" }, g);
+    var t = el("text", { y: 5, "text-anchor": "middle", class: "ss-role" }, g, "role/" + r.toLowerCase());
+    return { b: b, t: t };
+  });
+  // remote state + no stored keys
+  var st = el("g", { transform: "translate(40 628)" });
+  el("rect", { width: 228, height: 54, rx: 10, fill: "#fff", stroke: "#cbd5e1" }, st);
+  el("path", { d: "M20 16 h22 l-3 26 h-16z", fill: "#16a34a" }, st);
+  el("ellipse", { cx: 31, cy: 16, rx: 11, ry: 4, fill: "#22c55e" }, st);
+  el("text", { x: 54, y: 24, class: "ss-node" }, st, "S3 remote state");
+  var lockTx = el("text", { x: 54, y: 41, class: "ss-sub" }, st, "state lock · free");
+  var nk = el("g", { transform: "translate(292 628)" });
+  el("rect", { width: 228, height: 54, rx: 10, fill: "#fff", stroke: "#fecaca" }, nk);
+  el("circle", { cx: 30, cy: 27, r: 9, fill: "none", stroke: "#94a3b8", "stroke-width": 3 }, nk);
+  el("path", { d: "M38 27 h16 v6 M48 27 v5", fill: "none", stroke: "#94a3b8", "stroke-width": 3 }, nk);
+  el("line", { x1: 14, y1: 42, x2: 60, y2: 12, stroke: "#ef4444", "stroke-width": 3, "stroke-linecap": "round" }, nk);
+  el("text", { x: 72, y: 24, class: "ss-node" }, nk, "Long-lived keys");
+  el("text", { x: 72, y: 41, class: "ss-sub red" }, nk, "none stored in CI");
+  chip(280, 712, "2 · OIDC GIVES THE PIPELINE SHORT-LIVED CREDENTIALS", "#c4b5fd");
+
+  // ---------- 3. the AWS infrastructure Terraform builds ----------
+  var vpc = el("g", { transform: "translate(24 734)" });
+  el("rect", { width: 512, height: 150, rx: 12, fill: "#fff", stroke: "#8b5cf6", "stroke-dasharray": "6 5" }, vpc);
+  el("text", { x: 14, y: 20, class: "ss-title" }, vpc, "VPC · 10.0.0.0/16");
+  var RES = [];
+  function res(node) { node.setAttribute("class", (node.getAttribute("class") || "") + " ss-res"); RES.push(node); return node; }
+  var pub = res(el("g", { transform: "translate(14 30)" }, vpc));
+  el("rect", { width: 196, height: 108, rx: 8, fill: "#ecfdf5", stroke: "#86efac" }, pub);
+  el("text", { x: 10, y: 17, class: "ss-sub green" }, pub, "PUBLIC SUBNETS");
+  function box(parent, x, y, w, label, color) {
+    var g = res(el("g", { transform: "translate(" + x + " " + y + ")" }, parent));
+    el("rect", { width: w, height: 30, rx: 6, fill: "#fff", stroke: color }, g);
+    el("text", { x: w / 2, y: 19.5, "text-anchor": "middle", class: "ss-res-t" }, g, label);
+    return g;
+  }
+  box(pub, 10, 28, 84, "Internet GW", "#86efac"); box(pub, 102, 28, 84, "NAT GW", "#86efac");
+  box(pub, 10, 66, 176, "Route tables · Security groups", "#86efac");
+  var prv = res(el("g", { transform: "translate(222 30)" }, vpc));
+  el("rect", { width: 276, height: 108, rx: 8, fill: "#eff6ff", stroke: "#93c5fd" }, prv);
+  el("text", { x: 10, y: 17, class: "ss-sub blue" }, prv, "PRIVATE SUBNETS · ECS");
+  [0, 1, 2].forEach(function (i) { box(prv, 10 + i * 64, 28, 56, "task " + (i + 1), "#93c5fd"); });
+  box(prv, 202, 28, 64, "ECR", "#c4b5fd");
+  box(prv, 10, 66, 120, "ECS cluster", "#93c5fd");
+  box(prv, 138, 66, 128, "KMS · encrypted", "#fcd34d");
+  chip(280, 902, "3 · TERRAFORM BUILDS A SECURE VPC + ECS", "#93c5fd");
+
+  // flows
+  function flow(id, d, n, dur) {
+    el("path", { d: d, fill: "none", stroke: "#e2e8f0", "stroke-width": 3, "stroke-linecap": "round" });
+    var g = el("g", {});
+    el("path", { id: id, d: d, fill: "none", stroke: "#8b5cf6", "stroke-width": 2, "stroke-dasharray": "4 10", class: "fs-dash" }, g);
+    if (reduceMotion) return;
+    for (var i = 0; i < n; i++) {
+      var c = el("circle", { r: 6, fill: "url(#ssGlow)" }, g);
+      var m = el("animateMotion", { dur: dur + "s", repeatCount: "indefinite", begin: (-i * dur / n).toFixed(2) + "s" }, c);
+      el("mpath", { href: "#" + id }, m);
+    }
+  }
+  flow("ssf1", "M250 220 C270 220 280 220 300 220", 2, 1.2);
+  flow("ssf2", "M418 324 C418 400 90 420 76 484", 3, 2.4);
+  flow("ssf3", "M484 532 C520 600 540 700 470 764", 3, 2.4);
+  chips.forEach(function (c) {
+    var g = el("g", { transform: "translate(" + c[0] + " " + c[1] + ")" });
+    var w = c[2].length * 6.7 + 26;
+    el("rect", { x: -w / 2, y: -13, width: w, height: 26, rx: 13, fill: "#fff", stroke: c[3] }, g);
+    el("text", { x: 0, y: 4.5, "text-anchor": "middle", class: "fs-chip" }, g, c[2]);
+  });
+  svg.appendChild(token);
+
+  // ---------- dashboard ----------
+  var dash = el("g", { transform: "translate(20 920)" });
+  el("rect", { width: 520, height: 168, rx: 14, fill: "#0f172a" }, dash);
+  el("text", { x: 18, y: 26, class: "fs-dtitle" }, dash, "TERRAFORM PIPELINE · AWS");
+  var pill = el("g", { transform: "translate(400 12)" }, dash);
+  var pillBg = el("rect", { width: 104, height: 22, rx: 11, fill: "#3730a3" }, pill);
+  var pillTx = el("text", { x: 52, y: 15, "text-anchor": "middle", class: "fs-pill" }, pill, "RUNNING");
+  var T = [["STAGE", ""], ["RESOURCES", ""], ["CREDENTIALS", "STS"], ["STATIC KEYS", ""]].map(function (t, i) {
+    var g = el("g", { transform: "translate(" + (18 + i * 124) + " 40)" }, dash);
+    el("rect", { width: 114, height: 46, rx: 8, fill: "#1e293b" }, g);
+    el("text", { x: 10, y: 16, class: "fs-tlabel" }, g, t[0]);
+    var v = el("text", { x: 10, y: 37, class: "fs-tval ss-tv" }, g, "");
+    el("text", { x: 104, y: 37, "text-anchor": "end", class: "fs-tunit" }, g, t[1]);
+    return v;
+  });
+  T[3].textContent = "0";
+  el("text", { x: 18, y: 106, class: "fs-tlabel" }, dash, "PIPELINE LOG");
+  var logs = [0, 1].map(function (i) { return el("text", { x: 18, y: 128 + i * 22, class: "av-log" }, dash, ""); });
+  function log(s) { logs[1].textContent = logs[0].textContent; logs[0].textContent = s; }
+
+  // ---------- the run ----------
+  var visible = true, timers = [];
+  function later(fn, ms) { timers.push(setTimeout(function () { if (visible || reduceMotion) fn(); else later(fn, 400); }, reduceMotion ? 0 : ms)); }
+  function setStage(i, state) {
+    var s = stDots[i];
+    s.d.setAttribute("fill", state === "done" ? "#22c55e" : state === "run" ? "#6366f1" : "#e2e8f0");
+    s.d.setAttribute("class", state === "run" ? "ss-run" : "");
+    s.tag.textContent = state === "done" ? "passed" : state === "run" ? "running" : "";
+    s.tag.setAttribute("fill", state === "done" ? "#16a34a" : "#6366f1");
+  }
+  function moveToken(to) {
+    var x0 = parseFloat(token.getAttribute("cx")), x1 = NODES[to][2], t0 = performance.now();
+    nodeEls.forEach(function (b, k) { b.setAttribute("stroke", k <= to ? "#8b5cf6" : "#cbd5e1"); });
+    if (reduceMotion) { token.setAttribute("cx", x1); return; }
+    (function st(now) { var t = Math.min(1, (now - t0) / 500); token.setAttribute("cx", (x0 + (x1 - x0) * t).toFixed(1)); if (t < 1) requestAnimationFrame(st); })(t0);
+  }
+  function role(i) { roleEls.forEach(function (r, k) { r.b.setAttribute("fill", k === i ? "#ede9fe" : "#fff"); r.b.setAttribute("stroke", k === i ? "#8b5cf6" : "#cbd5e1"); }); }
+  function run() {
+    STAGES.forEach(function (_, i) { setStage(i, "wait"); });
+    RES.forEach(function (r) { r.classList.remove("on"); });
+    token.setAttribute("cx", 76); moveToken(0); role(-1);
+    pillTx.textContent = "RUNNING"; pillBg.setAttribute("fill", "#3730a3");
+    T[0].textContent = "init"; T[1].textContent = "0"; T[2].textContent = "—";
+    lockTx.textContent = "state lock · acquired"; commit.classList.remove("pop"); void commit.getBBox(); commit.classList.add("pop");
+    log("$ git push → pipeline #" + (1200 + Math.floor(performance.now() / 1000) % 800) + " started");
+    setStage(0, "run");
+    later(function () { moveToken(1); log("OIDC token presented to IAM identity provider"); }, 600);
+    later(function () { moveToken(2); role(1); log("sts:AssumeRoleWithWebIdentity → role/plan ✓"); T[2].textContent = "1h"; }, 1200);
+    later(function () { moveToken(3); setStage(0, "done"); setStage(1, "run"); T[0].textContent = "validate"; log("terraform validate · Success! The configuration is valid."); }, 1800);
+    later(function () { setStage(1, "done"); setStage(2, "run"); T[0].textContent = "plan"; log("Plan: " + RES.length + " to add, 0 to change, 0 to destroy."); }, 2800);
+    later(function () { setStage(2, "done"); setStage(3, "run"); role(2); T[0].textContent = "apply"; log("sts:AssumeRoleWithWebIdentity → role/apply ✓"); }, 4000);
+    RES.forEach(function (r, i) {
+      later(function () { r.classList.add("on"); T[1].textContent = (i + 1) + "/" + RES.length; }, 4400 + i * 260);
+    });
+    var end = 4400 + RES.length * 260 + 300;
+    later(function () {
+      setStage(3, "done"); T[0].textContent = "done"; role(-1);
+      pillTx.textContent = "APPLIED"; pillBg.setAttribute("fill", "#14532d");
+      lockTx.textContent = "state saved · lock released";
+      log("Apply complete! Resources: " + RES.length + " added, 0 changed, 0 destroyed.");
+    }, end);
+    if (!reduceMotion) later(run, end + 4200);
+  }
+  run();
+  if ("IntersectionObserver" in window && !reduceMotion) {
+    new IntersectionObserver(function (en) {
+      visible = en[0].isIntersecting;
+      if (svg.pauseAnimations) visible ? svg.unpauseAnimations() : svg.pauseAnimations();
+    }).observe(svg);
+  }
+})();
