@@ -594,9 +594,9 @@
   }
 })();
 
-/* Projects: the Sensei scene. A Terraform change is pushed; GitLab CI runs init → validate → plan → apply;
-   the runner signs in to AWS through OIDC (no stored keys) and assumes the Plan or Apply role through STS;
-   Terraform then builds the VPC, subnets, gateways, ECS and ECR, with state in S3 and encryption via KMS. */
+/* Projects: the Sensei scene — Encore 360°, Sensei's digital banking platform, running on AWS.
+   Bank staff use the Encore 360° home screen; requests reach the platform through CloudFront and the API
+   on ECS inside a private VPC; every infrastructure change ships through GitLab CI with OIDC. */
 (function () {
   "use strict";
   var svg = document.getElementById("ssScene");
@@ -611,132 +611,125 @@
     return n;
   }
   el("defs").innerHTML =
-    '<linearGradient id="ssSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c7d2fe"/><stop offset="1" stop-color="#eef2ff"/></linearGradient>' +
-    '<radialGradient id="ssGlow"><stop offset="0" stop-color="#f5f3ff"/><stop offset=".4" stop-color="#8b5cf6"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></radialGradient>';
-  el("rect", { width: 560, height: 1100, fill: "#f8fafc" });
-  el("rect", { width: 560, height: 470, fill: "url(#ssSky)" });
+    '<linearGradient id="enBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#111a2e"/></linearGradient>' +
+    '<radialGradient id="enHalo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f97316" stop-opacity=".22"/><stop offset="1" stop-color="#f97316" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="enGlow"><stop offset="0" stop-color="#fff7ed"/><stop offset=".4" stop-color="#fb923c"/><stop offset="1" stop-color="#fb923c" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="enGlowB"><stop offset="0" stop-color="#eff6ff"/><stop offset=".4" stop-color="#38bdf8"/><stop offset="1" stop-color="#38bdf8" stop-opacity="0"/></radialGradient>';
+  // background and grid come from CSS so they cover the whole box
+  el("circle", { cx: 280, cy: 220, r: 240, fill: "url(#enHalo)" });
 
   var chips = [];
-  function chip(x, y, text, color) { chips.push([x, y, text, color]); }
+  function chip(x, y, text) { chips.push([x, y, text]); }
 
-  // ---------- 1. laptop with Terraform + GitLab pipeline ----------
-  var lap = el("g", { transform: "translate(30 150)" });
-  el("rect", { width: 220, height: 140, rx: 10, fill: "#0f172a" }, lap);
-  el("rect", { x: 8, y: 8, width: 204, height: 124, rx: 6, fill: "#111827" }, lap);
-  [["module ", "#c084fc", "\"vpc\" {"], ["  cidr = ", "#94a3b8", "\"10.0.0.0/16\""], ["  azs  = ", "#94a3b8", "2"], ["}", "#e2e8f0", ""], ["backend ", "#c084fc", "\"s3\" {"], ["  encrypt = ", "#94a3b8", "true"]].forEach(function (l, i) {
-    var t = el("text", { x: 18, y: 30 + i * 17, class: "ss-code" }, lap);
-    el("tspan", { fill: l[1] }, t, l[0]); el("tspan", { fill: "#86efac" }, t, l[2]);
+  // ---------- 1. the Encore 360° banking dashboard ----------
+  var app = el("g", { transform: "translate(30 90)" });
+  el("rect", { width: 500, height: 300, rx: 12, fill: "#f8fafc" }, app);
+  el("path", { d: "M0 12 a12 12 0 0 1 12 -12 h476 a12 12 0 0 1 12 12 v32 h-500z", fill: "#111827" }, app);
+  var brand = el("text", { x: 16, y: 29, class: "en-brand" }, app);
+  el("tspan", {}, brand, "encore "); el("tspan", { fill: "#fb923c" }, brand, "360°");
+  el("rect", { x: 118, y: 14, width: 34, height: 16, rx: 3, fill: "#dc2626" }, app);
+  el("text", { x: 135, y: 26, "text-anchor": "middle", class: "en-badge" }, app, "24×7");
+  ["Setup", "Manage", "Customer", "Products", "Reports"].forEach(function (n, i) {
+    el("text", { x: 176 + i * 64, y: 27, class: "en-nav" }, app, n + " ▾");
   });
-  el("path", { d: "M-14 140 h248 l-12 14 h-224z", fill: "#cbd5e1" }, lap);
-  var commit = el("g", { transform: "translate(30 112)", class: "ss-commit" });
-  el("rect", { width: 150, height: 26, rx: 13, fill: "#fff", stroke: "#a5b4fc" }, commit);
-  el("text", { x: 75, y: 17.5, "text-anchor": "middle", class: "ss-small" }, commit, "git push · main");
-
-  var pipe = el("g", { transform: "translate(300 110)" });
-  el("rect", { width: 236, height: 214, rx: 12, fill: "#fff", stroke: "#c7d2fe" }, pipe);
-  el("text", { x: 16, y: 26, class: "ss-title" }, pipe, "GITLAB CI/CD · main");
-  var STAGES = ["terraform init", "terraform validate", "terraform plan", "terraform apply"];
-  var stDots = STAGES.map(function (s, i) {
-    var g = el("g", { transform: "translate(16 " + (48 + i * 40) + ")" }, pipe);
-    el("rect", { width: 204, height: 30, rx: 8, fill: "#f8fafc", stroke: "#e2e8f0" }, g);
-    var d = el("circle", { cx: 16, cy: 15, r: 7, fill: "#e2e8f0" }, g);
-    el("text", { x: 32, y: 19.5, class: "ss-stage" }, g, s);
-    var tag = el("text", { x: 194, y: 19.5, "text-anchor": "end", class: "ss-tag" }, g, "");
-    return { d: d, tag: tag };
+  el("text", { x: 18, y: 72, class: "en-h" }, app, "Welcome to Encore Banking");
+  el("text", { x: 18, y: 90, class: "en-sub" }, app, "Asset & liability products · compliance · decisions");
+  var TILES = [["DEPOSITS", "₹", 0], ["LOANS", "₹", 1], ["CUSTOMERS", "", 2], ["COMPLIANCE", "", 3]];
+  var tv = TILES.map(function (t, i) {
+    var g = el("g", { transform: "translate(" + (18 + i * 118) + " 104)" }, app);
+    el("rect", { width: 110, height: 62, rx: 8, fill: "#fff", stroke: "#e2e8f0" }, g);
+    el("rect", { width: 4, height: 62, rx: 2, fill: ["#f97316", "#0ea5e9", "#22c55e", "#a855f7"][i] }, g);
+    el("text", { x: 14, y: 20, class: "en-tl" }, g, t[0]);
+    return el("text", { x: 14, y: 46, class: "en-tv" }, g, "");
   });
-  chip(280, 440, "1 · GITLAB CI RUNS TERRAFORM ON EVERY CHANGE", "#a5b4fc");
+  // transactions list
+  el("text", { x: 18, y: 192, class: "en-tl" }, app, "LIVE TRANSACTIONS");
+  var rows = [0, 1, 2, 3].map(function (i) {
+    var g = el("g", { transform: "translate(18 " + (202 + i * 22) + ")" }, app);
+    el("rect", { width: 464, height: 18, rx: 4, fill: i % 2 ? "#fff" : "#f1f5f9" }, g);
+    return [el("text", { x: 8, y: 13, class: "en-row" }, g, ""), el("text", { x: 230, y: 13, class: "en-row dim" }, g, ""), el("text", { x: 456, y: 13, "text-anchor": "end", class: "en-row b" }, g, "")];
+  });
+  chip(280, 428, "1 · BANKS RUN ON ENCORE 360° — 24×7");
 
-  // ---------- 2. OIDC: no stored keys ----------
-  var NODES = [["GitLab runner", "OIDC token", 76], ["IAM OIDC", "provider", 212], ["AWS STS", "AssumeRole", 348], ["Temp creds", "expire in 1h", 484]];
-  var nodeEls = NODES.map(function (n) {
-    var g = el("g", { transform: "translate(" + n[2] + " 508)" });
-    var b = el("rect", { x: -58, y: -24, width: 116, height: 48, rx: 10, fill: "#fff", stroke: "#cbd5e1" }, g);
-    el("text", { y: -3, "text-anchor": "middle", class: "ss-node" }, g, n[0]);
-    el("text", { y: 13, "text-anchor": "middle", class: "ss-sub" }, g, n[1]);
+  // ---------- 2. served from AWS ----------
+  function node(x, y, w, title, sub, color) {
+    var g = el("g", { transform: "translate(" + x + " " + y + ")" });
+    var b = el("rect", { x: -w / 2, y: -24, width: w, height: 48, rx: 10, fill: "#0f172a", stroke: color, "stroke-width": 1.5 }, g);
+    el("text", { y: -3, "text-anchor": "middle", class: "en-node" }, g, title);
+    el("text", { y: 13, "text-anchor": "middle", class: "en-nsub" }, g, sub);
     return b;
-  });
-  var token = el("circle", { cx: 76, cy: 508, r: 8, fill: "url(#ssGlow)" });
-  var ROLES = ["Bootstrap", "Plan", "Apply"];
-  el("text", { x: 280, y: 566, "text-anchor": "middle", class: "ss-sub" }, null, "SEPARATE LEAST-PRIVILEGE IAM ROLES");
-  var roleEls = ROLES.map(function (r, i) {
-    var g = el("g", { transform: "translate(" + (130 + i * 150) + " 592)" });
-    var b = el("rect", { x: -56, y: -15, width: 112, height: 30, rx: 15, fill: "#fff", stroke: "#cbd5e1" }, g);
-    var t = el("text", { y: 5, "text-anchor": "middle", class: "ss-role" }, g, "role/" + r.toLowerCase());
-    return { b: b, t: t };
-  });
-  // remote state + no stored keys
-  var st = el("g", { transform: "translate(40 628)" });
-  el("rect", { width: 228, height: 54, rx: 10, fill: "#fff", stroke: "#cbd5e1" }, st);
-  el("path", { d: "M20 16 h22 l-3 26 h-16z", fill: "#16a34a" }, st);
-  el("ellipse", { cx: 31, cy: 16, rx: 11, ry: 4, fill: "#22c55e" }, st);
-  el("text", { x: 54, y: 24, class: "ss-node" }, st, "S3 remote state");
-  var lockTx = el("text", { x: 54, y: 41, class: "ss-sub" }, st, "state lock · free");
-  var nk = el("g", { transform: "translate(292 628)" });
-  el("rect", { width: 228, height: 54, rx: 10, fill: "#fff", stroke: "#fecaca" }, nk);
-  el("circle", { cx: 30, cy: 27, r: 9, fill: "none", stroke: "#94a3b8", "stroke-width": 3 }, nk);
-  el("path", { d: "M38 27 h16 v6 M48 27 v5", fill: "none", stroke: "#94a3b8", "stroke-width": 3 }, nk);
-  el("line", { x1: 14, y1: 42, x2: 60, y2: 12, stroke: "#ef4444", "stroke-width": 3, "stroke-linecap": "round" }, nk);
-  el("text", { x: 72, y: 24, class: "ss-node" }, nk, "Long-lived keys");
-  el("text", { x: 72, y: 41, class: "ss-sub red" }, nk, "none stored in CI");
-  chip(280, 712, "2 · OIDC GIVES THE PIPELINE SHORT-LIVED CREDENTIALS", "#c4b5fd");
-
-  // ---------- 3. the AWS infrastructure Terraform builds ----------
-  var vpc = el("g", { transform: "translate(24 734)" });
-  el("rect", { width: 512, height: 150, rx: 12, fill: "#fff", stroke: "#8b5cf6", "stroke-dasharray": "6 5" }, vpc);
-  el("text", { x: 14, y: 20, class: "ss-title" }, vpc, "VPC · 10.0.0.0/16");
-  var RES = [];
-  function res(node) { node.setAttribute("class", (node.getAttribute("class") || "") + " ss-res"); RES.push(node); return node; }
-  var pub = res(el("g", { transform: "translate(14 30)" }, vpc));
-  el("rect", { width: 196, height: 108, rx: 8, fill: "#ecfdf5", stroke: "#86efac" }, pub);
-  el("text", { x: 10, y: 17, class: "ss-sub green" }, pub, "PUBLIC SUBNETS");
-  function box(parent, x, y, w, label, color) {
-    var g = res(el("g", { transform: "translate(" + x + " " + y + ")" }, parent));
-    el("rect", { width: w, height: 30, rx: 6, fill: "#fff", stroke: color }, g);
-    el("text", { x: w / 2, y: 19.5, "text-anchor": "middle", class: "ss-res-t" }, g, label);
-    return g;
   }
-  box(pub, 10, 28, 84, "Internet GW", "#86efac"); box(pub, 102, 28, 84, "NAT GW", "#86efac");
-  box(pub, 10, 66, 176, "Route tables · Security groups", "#86efac");
-  var prv = res(el("g", { transform: "translate(222 30)" }, vpc));
-  el("rect", { width: 276, height: 108, rx: 8, fill: "#eff6ff", stroke: "#93c5fd" }, prv);
-  el("text", { x: 10, y: 17, class: "ss-sub blue" }, prv, "PRIVATE SUBNETS · ECS");
-  [0, 1, 2].forEach(function (i) { box(prv, 10 + i * 64, 28, 56, "task " + (i + 1), "#93c5fd"); });
-  box(prv, 202, 28, 64, "ECR", "#c4b5fd");
-  box(prv, 10, 66, 120, "ECS cluster", "#93c5fd");
-  box(prv, 138, 66, 128, "KMS · encrypted", "#fcd34d");
-  chip(280, 902, "3 · TERRAFORM BUILDS A SECURE VPC + ECS", "#93c5fd");
+  node(90, 492, 130, "Bank users", "branches · ops", "#334155");
+  node(280, 492, 140, "CloudFront", "HTTPS · edge", "#38bdf8");
+  node(470, 492, 130, "Web app", "S3 static site", "#38bdf8");
+  // VPC with the API on ECS
+  var vpc = el("g", { transform: "translate(30 540)" });
+  el("rect", { width: 500, height: 170, rx: 12, fill: "none", stroke: "#a78bfa", "stroke-dasharray": "6 5" }, vpc);
+  el("text", { x: 14, y: 22, class: "en-vpc" }, vpc, "VPC · PRIVATE SUBNETS");
+  var tasks = [0, 1, 2].map(function (i) {
+    var g = el("g", { transform: "translate(" + (24 + i * 100) + " 44)" }, vpc);
+    el("rect", { width: 88, height: 50, rx: 8, fill: "#0f172a", stroke: "#475569" }, g);
+    el("text", { x: 44, y: 22, "text-anchor": "middle", class: "en-node" }, g, "Encore API");
+    el("text", { x: 44, y: 38, "text-anchor": "middle", class: "en-nsub" }, g, "ECS task " + (i + 1));
+    return el("circle", { cx: 78, cy: 10, r: 3.5, fill: "#22c55e" }, g);
+  });
+  [["ECR", "images", "#a78bfa"], ["KMS", "encrypted", "#fbbf24"]].forEach(function (b, i) {
+    var g = el("g", { transform: "translate(" + (330 + i * 82) + " 44)" }, vpc);
+    el("rect", { width: 74, height: 50, rx: 8, fill: "#0f172a", stroke: b[2] }, g);
+    el("text", { x: 37, y: 22, "text-anchor": "middle", class: "en-node" }, g, b[0]);
+    el("text", { x: 37, y: 38, "text-anchor": "middle", class: "en-nsub" }, g, b[1]);
+  });
+  el("text", { x: 24, y: 124, class: "en-nsub l" }, vpc, "IAM: task execution role ≠ task role · restricted iam:PassRole");
+  el("text", { x: 24, y: 144, class: "en-nsub l" }, vpc, "Internet GW · NAT GW · route tables · security groups");
+  chip(280, 732, "2 · SERVED SECURELY FROM AWS");
 
-  // flows
-  function flow(id, d, n, dur) {
-    el("path", { d: d, fill: "none", stroke: "#e2e8f0", "stroke-width": 3, "stroke-linecap": "round" });
+  // ---------- 3. GitLab CI with OIDC ----------
+  var STAGES = ["init", "validate", "plan", "apply"], stEls = [];
+  el("line", { x1: 76, y1: 790, x2: 484, y2: 790, stroke: "#334155", "stroke-width": 4, "stroke-linecap": "round" });
+  var fill = el("line", { x1: 76, y1: 790, x2: 76, y2: 790, stroke: "#fb923c", "stroke-width": 4, "stroke-linecap": "round" });
+  STAGES.forEach(function (s, i) {
+    var x = 76 + i * 136;
+    var g = el("g", { transform: "translate(" + x + " 790)" });
+    stEls.push(el("circle", { r: 14, fill: "#0f172a", stroke: "#475569", "stroke-width": 3 }, g));
+    el("text", { y: 34, "text-anchor": "middle", class: "en-stage" }, g, "terraform " + s);
+  });
+  var oidc = el("g", { transform: "translate(280 852)" });
+  el("rect", { x: -200, y: -16, width: 400, height: 32, rx: 16, fill: "#0f172a", stroke: "#a78bfa" }, oidc);
+  var oidcTx = el("text", { y: 5, "text-anchor": "middle", class: "en-oidc" }, oidc, "GitLab OIDC → STS → role/plan · no stored keys");
+  chip(280, 896, "3 · EVERY CHANGE SHIPS THROUGH GITLAB CI + OIDC");
+
+  // ---------- request flows ----------
+  function flow(id, d, n, dur, blue) {
+    el("path", { d: d, fill: "none", stroke: "#1e293b", "stroke-width": 3, "stroke-linecap": "round" });
     var g = el("g", {});
-    el("path", { id: id, d: d, fill: "none", stroke: "#8b5cf6", "stroke-width": 2, "stroke-dasharray": "4 10", class: "fs-dash" }, g);
+    el("path", { id: id, d: d, fill: "none", stroke: blue ? "#38bdf8" : "#fb923c", "stroke-width": 2, "stroke-dasharray": "4 10", class: "fs-dash" }, g);
     if (reduceMotion) return;
     for (var i = 0; i < n; i++) {
-      var c = el("circle", { r: 6, fill: "url(#ssGlow)" }, g);
+      var c = el("circle", { r: 6, fill: blue ? "url(#enGlowB)" : "url(#enGlow)" }, g);
       var m = el("animateMotion", { dur: dur + "s", repeatCount: "indefinite", begin: (-i * dur / n).toFixed(2) + "s" }, c);
       el("mpath", { href: "#" + id }, m);
     }
   }
-  flow("ssf1", "M250 220 C270 220 280 220 300 220", 2, 1.2);
-  flow("ssf2", "M418 324 C418 400 90 420 76 484", 3, 2.4);
-  flow("ssf3", "M484 532 C520 600 540 700 470 764", 3, 2.4);
+  flow("enf1", "M155 492 L210 492", 2, 1.0, true);
+  flow("enf2", "M350 492 L405 492", 2, 1.0, true);
+  flow("enf3", "M280 516 C280 560 200 560 168 584", 3, 1.6, true);
+  flow("enf4", "M90 468 C60 430 60 410 90 390", 2, 1.4, false);
+  flow("enf5", "M484 790 C540 760 540 640 510 600", 2, 2.0, false);
   chips.forEach(function (c) {
     var g = el("g", { transform: "translate(" + c[0] + " " + c[1] + ")" });
     var w = c[2].length * 6.7 + 26;
-    el("rect", { x: -w / 2, y: -13, width: w, height: 26, rx: 13, fill: "#fff", stroke: c[3] }, g);
+    el("rect", { x: -w / 2, y: -13, width: w, height: 26, rx: 13, fill: "#fff7ed", stroke: "#fb923c" }, g);
     el("text", { x: 0, y: 4.5, "text-anchor": "middle", class: "fs-chip" }, g, c[2]);
   });
-  svg.appendChild(token);
 
   // ---------- dashboard ----------
   var dash = el("g", { transform: "translate(20 920)" });
-  el("rect", { width: 520, height: 168, rx: 14, fill: "#0f172a" }, dash);
-  el("text", { x: 18, y: 26, class: "fs-dtitle" }, dash, "TERRAFORM PIPELINE · AWS");
+  el("rect", { width: 520, height: 168, rx: 14, fill: "#020617", stroke: "#1e293b" }, dash);
+  el("text", { x: 18, y: 26, class: "fs-dtitle" }, dash, "ENCORE 360° · PLATFORM ON AWS");
   var pill = el("g", { transform: "translate(400 12)" }, dash);
-  var pillBg = el("rect", { width: 104, height: 22, rx: 11, fill: "#3730a3" }, pill);
-  var pillTx = el("text", { x: 52, y: 15, "text-anchor": "middle", class: "fs-pill" }, pill, "RUNNING");
-  var T = [["STAGE", ""], ["RESOURCES", ""], ["CREDENTIALS", "STS"], ["STATIC KEYS", ""]].map(function (t, i) {
+  var pillBg = el("rect", { width: 104, height: 22, rx: 11, fill: "#14532d" }, pill);
+  var pillTx = el("text", { x: 52, y: 15, "text-anchor": "middle", class: "fs-pill" }, pill, "ONLINE 24×7");
+  var T = [["SERVICE", ""], ["ECS TASKS", "healthy"], ["PIPELINE", ""], ["STATIC KEYS", ""]].map(function (t, i) {
     var g = el("g", { transform: "translate(" + (18 + i * 124) + " 40)" }, dash);
     el("rect", { width: 114, height: 46, rx: 8, fill: "#1e293b" }, g);
     el("text", { x: 10, y: 16, class: "fs-tlabel" }, g, t[0]);
@@ -744,55 +737,59 @@
     el("text", { x: 104, y: 37, "text-anchor": "end", class: "fs-tunit" }, g, t[1]);
     return v;
   });
-  T[3].textContent = "0";
-  el("text", { x: 18, y: 106, class: "fs-tlabel" }, dash, "PIPELINE LOG");
+  T[0].textContent = "Online"; T[1].textContent = "3/3"; T[3].textContent = "0";
+  el("text", { x: 18, y: 106, class: "fs-tlabel" }, dash, "ACTIVITY");
   var logs = [0, 1].map(function (i) { return el("text", { x: 18, y: 128 + i * 22, class: "av-log" }, dash, ""); });
   function log(s) { logs[1].textContent = logs[0].textContent; logs[0].textContent = s; }
 
-  // ---------- the run ----------
-  var visible = true, timers = [];
-  function later(fn, ms) { timers.push(setTimeout(function () { if (visible || reduceMotion) fn(); else later(fn, 400); }, reduceMotion ? 0 : ms)); }
-  function setStage(i, state) {
-    var s = stDots[i];
-    s.d.setAttribute("fill", state === "done" ? "#22c55e" : state === "run" ? "#6366f1" : "#e2e8f0");
-    s.d.setAttribute("class", state === "run" ? "ss-run" : "");
-    s.tag.textContent = state === "done" ? "passed" : state === "run" ? "running" : "";
-    s.tag.setAttribute("fill", state === "done" ? "#16a34a" : "#6366f1");
+  // ---------- simulation (illustrative data) ----------
+  var TX = [["Term deposit opened", "Branch 014"], ["Loan EMI received", "Retail loans"], ["KYC verified", "Compliance"], ["Fixed deposit renewed", "Branch 027"],
+            ["Loan disbursed", "MSME"], ["Savings account opened", "Branch 009"], ["Interest posted", "Batch"], ["AML check cleared", "Compliance"]];
+  var AMT = ["₹ 2,50,000", "₹ 18,420", "—", "₹ 5,00,000", "₹ 12,00,000", "₹ 10,000", "₹ 3,146", "—"];
+  var dep = 482.6, loans = 361.2, cust = 18240, comp = 98, txi = 0, list = [], visible = true, stage = -1, building = false;
+  function money(cr) { return "₹" + cr.toFixed(1) + " Cr"; }
+  function tickApp() {
+    var k = txi++ % TX.length;
+    list.unshift([TX[k][0], TX[k][1], AMT[k]]); list = list.slice(0, 4);
+    rows.forEach(function (r, i) { var v = list[i] || ["", "", ""]; r[0].textContent = v[0]; r[1].textContent = v[1]; r[2].textContent = v[2]; });
+    dep += Math.random() * .4; loans += Math.random() * .3; cust += Math.round(Math.random() * 3);
+    tv[0].textContent = money(dep); tv[1].textContent = money(loans);
+    tv[2].textContent = cust.toLocaleString("en-IN"); tv[3].textContent = comp + "% ✓";
   }
-  function moveToken(to) {
-    var x0 = parseFloat(token.getAttribute("cx")), x1 = NODES[to][2], t0 = performance.now();
-    nodeEls.forEach(function (b, k) { b.setAttribute("stroke", k <= to ? "#8b5cf6" : "#cbd5e1"); });
-    if (reduceMotion) { token.setAttribute("cx", x1); return; }
-    (function st(now) { var t = Math.min(1, (now - t0) / 500); token.setAttribute("cx", (x0 + (x1 - x0) * t).toFixed(1)); if (t < 1) requestAnimationFrame(st); })(t0);
+  function runPipeline() {
+    building = true; stage = 0;
+    stEls.forEach(function (c) { c.setAttribute("fill", "#0f172a"); c.setAttribute("stroke", "#475569"); });
+    fill.setAttribute("x2", 76);
+    pillTx.textContent = "DEPLOYING"; pillBg.setAttribute("fill", "#7c2d12");
+    log("GitLab pipeline started · OIDC token → AWS STS");
+    (function next() {
+      if (!visible && !reduceMotion) { setTimeout(next, 400); return; }
+      var x = 76 + stage * 136;
+      stEls[stage].setAttribute("fill", "#fb923c"); stEls[stage].setAttribute("stroke", "#fdba74");
+      fill.setAttribute("x2", x);
+      T[2].textContent = STAGES[stage];
+      oidcTx.textContent = "GitLab OIDC → STS → role/" + (stage === 3 ? "apply" : "plan") + " · no stored keys";
+      if (stage === 2) log("terraform plan · 2 to change (ECS service, task definition)");
+      if (stage === 3) {
+        tasks.forEach(function (t, i) { setTimeout(function () { t.setAttribute("fill", "#fbbf24"); setTimeout(function () { t.setAttribute("fill", "#22c55e"); }, 700); }, i * 500); });
+        log("ECS rolling update · zero downtime");
+      }
+      if (stage < 3) { stage++; setTimeout(next, reduceMotion ? 0 : 1100); }
+      else setTimeout(function () {
+        T[2].textContent = "done"; building = false;
+        pillTx.textContent = "ONLINE 24×7"; pillBg.setAttribute("fill", "#14532d");
+        log("Apply complete · Encore 360° serving traffic ✓");
+      }, reduceMotion ? 0 : 1800);
+    })();
   }
-  function role(i) { roleEls.forEach(function (r, k) { r.b.setAttribute("fill", k === i ? "#ede9fe" : "#fff"); r.b.setAttribute("stroke", k === i ? "#8b5cf6" : "#cbd5e1"); }); }
-  function run() {
-    STAGES.forEach(function (_, i) { setStage(i, "wait"); });
-    RES.forEach(function (r) { r.classList.remove("on"); });
-    token.setAttribute("cx", 76); moveToken(0); role(-1);
-    pillTx.textContent = "RUNNING"; pillBg.setAttribute("fill", "#3730a3");
-    T[0].textContent = "init"; T[1].textContent = "0"; T[2].textContent = "—";
-    lockTx.textContent = "state lock · acquired"; commit.classList.remove("pop"); void commit.getBBox(); commit.classList.add("pop");
-    log("$ git push → pipeline #" + (1200 + Math.floor(performance.now() / 1000) % 800) + " started");
-    setStage(0, "run");
-    later(function () { moveToken(1); log("OIDC token presented to IAM identity provider"); }, 600);
-    later(function () { moveToken(2); role(1); log("sts:AssumeRoleWithWebIdentity → role/plan ✓"); T[2].textContent = "1h"; }, 1200);
-    later(function () { moveToken(3); setStage(0, "done"); setStage(1, "run"); T[0].textContent = "validate"; log("terraform validate · Success! The configuration is valid."); }, 1800);
-    later(function () { setStage(1, "done"); setStage(2, "run"); T[0].textContent = "plan"; log("Plan: " + RES.length + " to add, 0 to change, 0 to destroy."); }, 2800);
-    later(function () { setStage(2, "done"); setStage(3, "run"); role(2); T[0].textContent = "apply"; log("sts:AssumeRoleWithWebIdentity → role/apply ✓"); }, 4000);
-    RES.forEach(function (r, i) {
-      later(function () { r.classList.add("on"); T[1].textContent = (i + 1) + "/" + RES.length; }, 4400 + i * 260);
-    });
-    var end = 4400 + RES.length * 260 + 300;
-    later(function () {
-      setStage(3, "done"); T[0].textContent = "done"; role(-1);
-      pillTx.textContent = "APPLIED"; pillBg.setAttribute("fill", "#14532d");
-      lockTx.textContent = "state saved · lock released";
-      log("Apply complete! Resources: " + RES.length + " added, 0 changed, 0 destroyed.");
-    }, end);
-    if (!reduceMotion) later(run, end + 4200);
+  for (var i = 0; i < 4; i++) tickApp();
+  T[2].textContent = "idle";
+  log("Encore 360° online · CloudFront → ECS · 3/3 tasks healthy");
+  if (!reduceMotion) {
+    setInterval(function () { if (visible) tickApp(); }, 1800);
+    setInterval(function () { if (visible && !building) runPipeline(); }, 11000);
+    setTimeout(runPipeline, 2500);
   }
-  run();
   if ("IntersectionObserver" in window && !reduceMotion) {
     new IntersectionObserver(function (en) {
       visible = en[0].isIntersecting;
