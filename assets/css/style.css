@@ -356,16 +356,12 @@ main > section + section { border-top: 1px solid var(--line); }
 /* Experience: cinematic Himalayan trek */
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .journey { position: relative; display: grid; gap: 26px; margin-top: 8px; }
-.cine { position: relative; aspect-ratio: 16 / 9; border-radius: 22px; overflow: hidden; background: #0B1220; box-shadow: 0 26px 60px rgba(15,23,42,.25); isolation: isolate; }
-.cine-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.04); transition: transform 1.6s cubic-bezier(.2,.7,.2,1); }
-.cine.playing .cine-video, .cine.ended .cine-video { transform: none; }
-/* cinematic letterbox bars while the trek plays */
-.cine::before, .cine::after { content: ""; position: absolute; left: 0; right: 0; height: 7%; background: #000; z-index: 2; transform: scaleY(0); transition: transform .6s ease; }
-.cine::before { top: 0; transform-origin: top; }
-.cine::after { bottom: 0; transform-origin: bottom; }
-.cine.playing::before, .cine.playing::after { transform: scaleY(1); }
-.cine-shade { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(5,10,20,.35), rgba(5,10,20,0) 35%, rgba(5,10,20,0) 60%, rgba(5,10,20,.55)); transition: opacity .6s; pointer-events: none; }
-.cine.playing .cine-shade { opacity: .4; }
+.cine { position: relative; width: 100vw; margin-left: calc(50% - 50vw); aspect-ratio: 16 / 9; max-height: 92svh; background: transparent; isolation: isolate; }
+.cine-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  /* soft fade into the white page at the top and bottom, so the video has no hard edge */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 86%, transparent 100%);
+          mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 86%, transparent 100%); }
+.cine-shade { display: none; }
 
 /* start point at the trekker's feet */
 .cine-start {
@@ -382,34 +378,21 @@ main > section + section { border-top: 1px solid var(--line); }
 .cine-start:hover .cs-label, .cine-start:focus-visible .cs-label { background: #FCD34D; color: #1F1300; }
 .cine-start:focus-visible { outline: none; }
 .cine-start[hidden] { display: none; }
-.cine-hint { position: absolute; z-index: 3; left: 0; right: 0; top: 7%; text-align: center; color: #fff; font: 600 13px var(--body); letter-spacing: .2em; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,.5); transition: opacity .4s; }
+.cine-hint { position: absolute; z-index: 3; left: 0; right: 0; top: 14%; text-align: center; color: #fff; font: 600 13px var(--body); letter-spacing: .2em; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,.5); transition: opacity .4s; }
 .cine.started .cine-hint { opacity: 0; }
 
-/* "Summit reached" title when the flag goes up */
-.cine-title {
-  position: absolute; z-index: 3; left: 0; right: 0; top: 13%;
-  display: grid; justify-items: center; gap: 6px; margin: 0;
-  color: #fff; text-align: center; pointer-events: none;
-  font: 900 clamp(28px, 4.6vw, 64px)/1 var(--display); font-stretch: 85%; letter-spacing: .02em; text-transform: uppercase;
-  text-shadow: 0 4px 24px rgba(0,0,0,.45);
-  opacity: 0; transform: translateY(10px); letter-spacing: .3em;
-  transition: opacity .7s ease, transform .9s cubic-bezier(.2,.7,.2,1), letter-spacing 1.4s cubic-bezier(.2,.7,.2,1);
-}
-.cine-title small { font: 700 12px var(--body); letter-spacing: .3em; color: #FCD34D; }
-.cine.at-summit .cine-title { opacity: 1; transform: none; letter-spacing: .02em; }
 
 .cine-btn { position: absolute; z-index: 3; display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,.35); border-radius: 999px; background: rgba(11,15,24,.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; cursor: pointer; transition: background-color .2s, color .2s; }
 .cine-btn:hover, .cine-btn:focus-visible { background: #fff; color: var(--ink); }
 .cine-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .cine-btn[hidden] { display: none; }
-.cine-replay { left: 50%; bottom: 13%; transform: translateX(-50%); padding: 11px 20px; font: 700 13px var(--body); letter-spacing: .12em; text-transform: uppercase; }
-.cine-sound { right: 16px; top: 16px; width: 42px; height: 42px; justify-content: center; padding: 0; }
-.cine.playing .cine-sound { top: calc(7% + 12px); }
+.cine-replay { left: 50%; bottom: 17%; transform: translateX(-50%); padding: 11px 20px; font: 700 13px var(--body); letter-spacing: .12em; text-transform: uppercase; }
+.cine-sound { right: max(var(--gutter), env(safe-area-inset-right, 0px)); top: 15%; width: 42px; height: 42px; justify-content: center; padding: 0; }
 .cine-sound .spk { fill: currentColor; stroke: none; }
 .cine-sound .cross { display: none; }
 .cine-sound[aria-pressed="false"] .waves { display: none; }
 .cine-sound[aria-pressed="false"] .cross { display: inline; }
-.cine-progress { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,.15); }
+.cine-progress { position: absolute; z-index: 4; left: max(var(--gutter), env(safe-area-inset-left, 0px)); right: max(var(--gutter), env(safe-area-inset-right, 0px)); bottom: 3%; border-radius: 4px; overflow: hidden; height: 4px; background: rgba(255,255,255,.15); }
 .cine-progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #FCD34D, #EF4444); }
 
 /* see-through board on the video, opened from a flag */
@@ -461,13 +444,12 @@ main > section + section { border-top: 1px solid var(--line); }
 @keyframes flutter { 50% { transform: skewY(-8deg) scaleX(.88); } }
 
 @media (max-width: 760px) {
-  .cine { border-radius: 16px; }
   .cine-start { left: 14%; top: 82%; }
   .cs-dot { width: 22px; height: 22px; }
   .cs-label { padding: 7px 12px; font-size: 11.5px; }
   .cine-hint { font-size: 11px; letter-spacing: .14em; }
   .cine-replay { bottom: 12%; padding: 9px 16px; font-size: 12px; }
-  .cine-sound { width: 36px; height: 36px; right: 10px; top: 10px; }
+  .cine-sound { width: 36px; height: 36px; top: 14%; }
   .trek-board { position: relative; left: auto; bottom: auto; width: auto; margin-top: 4px; order: 3; background: #0F1626; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .tf-btn { padding: 4px 2px 8px; }
   .tf-year { font-size: 11px; letter-spacing: .08em; }
