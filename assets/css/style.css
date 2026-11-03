@@ -373,18 +373,20 @@ main > section + section { border-top: 1px solid var(--line); }
 .cine-sound[aria-pressed="false"] .cross { display: inline; }
 
 /* 3D road */
-.drive { position: relative; margin-top: -40px; padding-top: 40px; touch-action: pan-y; }
-.drive-hint { position: relative; z-index: 1; margin: 0 0 -6px; text-align: center; font: 600 12px var(--body); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.drive { position: relative; margin-top: -70px; touch-action: pan-y; }
+.drive-hint { position: relative; z-index: 1; margin: 0 0 -30px; text-align: center; font: 600 12px var(--body); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
 .drive-hint { transition: opacity .25s; }
 .drive.has-board .drive-hint { opacity: 0; }
-.road3d { display: block; width: 100%; height: auto; overflow: visible; cursor: ew-resize; }
+.road3d { display: block; width: 100vw; margin-left: calc(50% - 50vw); height: auto; overflow: visible; cursor: ew-resize; }
 .road3d text { font-family: var(--display); }
 .rd-end { font: 700 11px var(--body); letter-spacing: .2em; fill: #9aa5b4; }
 .rd-stop { cursor: pointer; outline: none; }
-.rd-pin { fill: #fff; stroke: #9aa5b4; stroke-width: 3; transition: fill .3s, stroke .3s; }
+.rd-pole { stroke: #64748b; stroke-width: 2.5; stroke-linecap: round; }
+.rd-flag { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1; transition: fill .3s; }
 .rd-year { font: 700 12px var(--body); letter-spacing: .14em; fill: var(--muted); transition: fill .3s; }
 .rd-role { font: 800 16px var(--display); fill: var(--ink); transition: fill .3s; }
-.rd-stop.is-reached .rd-pin { fill: #16A34A; stroke: #fff; }
+.rd-year, .rd-role { paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+.rd-stop.is-reached .rd-flag { fill: #16A34A; stroke: #15803D; }
 .rd-stop.is-reached .rd-year { fill: #15803D; }
 .rd-stop.is-active .rd-role { fill: #15803D; }
 .rd-stop:focus-visible .rd-role { text-decoration: underline; }
@@ -392,7 +394,7 @@ main > section + section { border-top: 1px solid var(--line); }
 /* green highway board above the road */
 .green-board {
   --post-x: 50%;
-  position: absolute; z-index: 4; left: 0; bottom: calc(210px - 104px + 34px);
+  position: absolute; z-index: 4; left: 0; top: 0;
   width: min(330px, calc(100% - 8px));
   pointer-events: none;
   opacity: 0; transform: translateY(12px) scale(.94); transform-origin: var(--post-x) 100%;
@@ -414,7 +416,7 @@ main > section + section { border-top: 1px solid var(--line); }
 
 @media (max-width: 760px) {
   .cine-sound { width: 36px; height: 36px; right: 14px; top: 16%; }
-  .drive { margin-top: -20px; padding-top: 20px; }
+  .drive { margin-top: -30px; }
   .drive-hint { font-size: 10.5px; letter-spacing: .1em; }
   .rd-role { font-size: 12px; }
   .rd-year { font-size: 11px; }

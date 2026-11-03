@@ -62,14 +62,14 @@
   ];
   var AT = [0.14, 0.38, 0.62, 0.86];
 
-  // ---------- the road ----------
+  // ---------- the mountain road ----------
   var drive = document.getElementById("drive");
   var svg = document.getElementById("road");
   var board = document.getElementById("driveBoard");
   var NS = "http://www.w3.org/2000/svg";
-  var H = 210, TOP = 104, FRONT = 160, SIDE = 16, LANE = 132;
-  var W, xs = [], x0, x1, car, carBody, wheels = [], smokeG, stopEls = [];
-  var pos, target, vel = 0, dir = 1, spin = 0, shown = -1, parts = [], raf = 0, lastT = 0;
+  var W, H, narrow, path, total, table = [], lens = [], car, carImg, smokeG, stopEls = [];
+  var pos = null, target = null, dir = 1, shown = -1, parts = [], raf = 0, lastT = 0, puffAcc = 0;
+  var CAR_W, CAR_H, AT = [0.14, 0.38, 0.62, 0.86];
 
   function el(tag, attrs, parent) {
     var n = document.createElementNS(NS, tag);
@@ -77,136 +77,169 @@
     if (parent) parent.appendChild(n);
     return n;
   }
+  // smooth curve through points (Catmull-Rom → cubic Bézier)
+  function smooth(pts) {
+    var d = "M" + pts[0][0].toFixed(1) + " " + pts[0][1].toFixed(1);
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      d += " C" + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + " " + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) +
+           " " + (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + " " + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) +
+           " " + p2[0].toFixed(1) + " " + p2[1].toFixed(1);
+    }
+    return d;
+  }
+  function mountain(x, base, w, h, fill, snow) {
+    var g = el("g", {}, mtns);
+    el("polygon", { points: [x - w / 2, base, x - w * .12, base - h * .78, x, base - h, x + w * .16, base - h * .74, x + w / 2, base].join(" "), fill: fill }, g);
+    if (snow) el("polygon", { points: [x - w * .12, base - h * .78, x, base - h, x + w * .16, base - h * .74, x + w * .07, base - h * .68, x - w * .02, base - h * .76, x - w * .08, base - h * .66].join(" "), fill: "#fff", opacity: .95 }, g);
+  }
+  function pine(parent, x, y, s) {
+    var g = el("g", { transform: "translate(" + x.toFixed(1) + " " + y.toFixed(1) + ") scale(" + s.toFixed(2) + ")" }, parent);
+    el("rect", { x: -2.5, y: -6, width: 5, height: 8, fill: "#6b4f3a" }, g);
+    el("polygon", { points: "-15,-4 15,-4 0,-26", fill: "url(#pine)" }, g);
+    el("polygon", { points: "-12,-17 12,-17 0,-38", fill: "url(#pine)" }, g);
+    el("polygon", { points: "-8,-30 8,-30 0,-48", fill: "url(#pine)" }, g);
+  }
+  var mtns;
 
   function build() {
-    W = Math.max(320, Math.round(drive.clientWidth));
-    var narrow = W < 640;
+    W = Math.max(320, document.documentElement.clientWidth);
+    narrow = W < 640;
+    H = narrow ? 300 : 360;
+    CAR_W = narrow ? 82 : 128; CAR_H = CAR_W * 226 / 300;
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
     svg.setAttribute("width", W); svg.setAttribute("height", H);
     svg.innerHTML = "";
-    var inset = 26, back = narrow ? 14 : 36;          // the far edge is a little shorter: perspective
-    x0 = inset + 34; x1 = W - inset - 34;
-    xs = AT.map(function (f) { return x0 + (x1 - x0) * f; });
 
     el("defs", {}, svg).innerHTML =
-      '<linearGradient id="rdTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b6473"/><stop offset=".55" stop-color="#3a414d"/><stop offset="1" stop-color="#2a3039"/></linearGradient>' +
-      '<linearGradient id="rdSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c6a55"/><stop offset="1" stop-color="#4a3d30"/></linearGradient>' +
-      '<radialGradient id="rdShadow"><stop offset="0" stop-color="#0f172a" stop-opacity=".22"/><stop offset="1" stop-color="#0f172a" stop-opacity="0"/></radialGradient>' +
-      '<linearGradient id="carRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6b5e"/><stop offset=".45" stop-color="#e53935"/><stop offset="1" stop-color="#9f1c1c"/></linearGradient>' +
-      '<linearGradient id="carGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dbeafe"/><stop offset="1" stop-color="#60a5fa"/></linearGradient>' +
-      '<radialGradient id="smoke"><stop offset="0" stop-color="#cbd5e1" stop-opacity=".9"/><stop offset="1" stop-color="#e2e8f0" stop-opacity="0"/></radialGradient>';
+      '<linearGradient id="mFar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3d1e2"/><stop offset="1" stop-color="#e9eff6"/></linearGradient>' +
+      '<linearGradient id="mMid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#93a8c2"/><stop offset="1" stop-color="#d6e0eb"/></linearGradient>' +
+      '<linearGradient id="meadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfead8"/><stop offset="1" stop-color="#ffffff"/></linearGradient>' +
+      '<linearGradient id="pine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f6b3c"/><stop offset=".55" stop-color="#1f4f2b"/><stop offset="1" stop-color="#16391f"/></linearGradient>' +
+      '<radialGradient id="smoke"><stop offset="0" stop-color="#cbd5e1" stop-opacity=".9"/><stop offset="1" stop-color="#e2e8f0" stop-opacity="0"/></radialGradient>' +
+      '<filter id="carSh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#0f172a" flood-opacity=".35"/></filter>';
 
-    // shadow, side face (thickness), top surface
-    el("ellipse", { cx: W / 2, cy: FRONT + SIDE + 6, rx: W / 2 - 10, ry: 14, fill: "url(#rdShadow)" }, svg);
-    el("polygon", { points: [inset, FRONT, W - inset, FRONT, W - inset, FRONT + SIDE, inset, FRONT + SIDE].join(" "), fill: "url(#rdSide)" }, svg);
-    el("polygon", { points: [inset + back, TOP, W - inset - back, TOP, W - inset, FRONT, inset, FRONT].join(" "), fill: "url(#rdTop)" }, svg);
-    // kerbs: red/white blocks along both edges
-    el("line", { x1: inset + back, y1: TOP + 2, x2: W - inset - back, y2: TOP + 2, stroke: "#fff", "stroke-width": 4 }, svg);
-    el("line", { x1: inset + back, y1: TOP + 2, x2: W - inset - back, y2: TOP + 2, stroke: "#dc2626", "stroke-width": 4, "stroke-dasharray": "14 14" }, svg);
-    el("line", { x1: inset, y1: FRONT - 2, x2: W - inset, y2: FRONT - 2, stroke: "#fff", "stroke-width": 4 }, svg);
-    el("line", { x1: inset, y1: FRONT - 2, x2: W - inset, y2: FRONT - 2, stroke: "#dc2626", "stroke-width": 4, "stroke-dasharray": "18 18" }, svg);
-    // lane line
-    el("line", { x1: inset + back / 2 + 10, y1: LANE, x2: W - inset - back / 2 - 10, y2: LANE, stroke: "#f8fafc", "stroke-width": 3, "stroke-dasharray": "22 18", opacity: .85 }, svg);
-    // start / finish
-    el("text", { x: inset + 4, y: FRONT + SIDE + 22, class: "rd-end" }, svg).textContent = narrow ? "" : "START";
+    // mountains in two layers, fading into the white page at the top
+    mtns = el("g", { class: "rd-mtns" }, svg);
+    var base = H * 0.56, n = narrow ? 4 : 7;
+    for (var i = 0; i < n; i++) mountain((i + 0.3) * W / (n - 0.6), base, W / n * 1.9, H * (0.36 + (i % 3) * 0.06), "url(#mFar)", true);
+    for (var j = 0; j < n - 1; j++) mountain((j + 0.85) * W / (n - 1), base + 6, W / n * 1.6, H * (0.24 + (j % 2) * 0.07), "url(#mMid)", j % 2 === 0);
+    // meadow
+    el("path", { d: "M0 " + (base - 4) + " Q " + W * 0.3 + " " + (base - 20) + " " + W * 0.55 + " " + (base - 2) + " T " + W + " " + (base - 6) + " V " + H + " H 0 Z", fill: "url(#meadow)" }, svg);
+    // trees behind the road
+    var back = el("g", {}, svg);
+    for (var t = 0; t < (narrow ? 9 : 18); t++) {
+      var tx = (t + 0.5) * W / (narrow ? 9 : 18) + ((t * 37) % 23) - 11;
+      pine(back, tx, base + 10 + ((t * 13) % 14), narrow ? 0.62 : 0.8 + ((t * 7) % 5) / 20);
+    }
 
-    // milestone checkpoints: chequered strip across the road + label below
+    // the winding road
+    var y0 = H * 0.76, amp = narrow ? 18 : 30, x0 = 10, x1 = W - 10;
+    var pts = [];
+    var waves = narrow ? 1 : 2;
+    for (var k = 0; k <= 8; k++) pts.push([x0 + (x1 - x0) * k / 8, y0 + Math.sin(k * Math.PI * waves / 4 + 0.6) * amp]);
+    var d = smooth(pts), rw = narrow ? 30 : 46;
+    el("path", { d: d, fill: "none", stroke: "#0f172a", "stroke-opacity": .12, "stroke-width": rw + 22, "stroke-linecap": "round", transform: "translate(0 10)" }, svg);   // soft shadow
+    el("path", { d: d, fill: "none", stroke: "#5b4a3a", "stroke-width": rw + 6, "stroke-linecap": "round", transform: "translate(0 7)" }, svg);                           // road edge (depth)
+    el("path", { d: d, fill: "none", stroke: "#ffffff", "stroke-width": rw + 8, "stroke-linecap": "round" }, svg);                                                         // kerb white
+    el("path", { d: d, fill: "none", stroke: "#dc2626", "stroke-width": rw + 8, "stroke-dasharray": "12 12" }, svg);                                                       // kerb red
+    path = el("path", { d: d, fill: "none", stroke: "#3b424e", "stroke-width": rw, "stroke-linecap": "round" }, svg);                                                      // asphalt
+    el("path", { d: d, fill: "none", stroke: "#f8fafc", "stroke-width": 2.5, "stroke-dasharray": "18 14", opacity: .85 }, svg);                                           // lane line
+    total = path.getTotalLength();
+    table = [];
+    for (var L = 0; L <= total; L += 2) table.push([path.getPointAtLength(L).x, L]);
+    lens = AT.map(function (f) { return lenAtX(x0 + (x1 - x0) * f); });
+
+    // milestone markers + labels
     stopEls = [];
     STOPS.forEach(function (s, i) {
-      var x = xs[i], g = el("g", { class: "rd-stop" + (s.current ? " is-current" : ""), tabindex: "0", role: "button",
+      var p = path.getPointAtLength(lens[i]);
+      var g = el("g", { class: "rd-stop" + (s.current ? " is-current" : ""), tabindex: "0", role: "button",
         "aria-label": s.role + ", " + s.company + ", " + s.dates, "data-i": i }, svg);
-      el("rect", { x: x - 30, y: TOP - 70, width: 60, height: H - TOP + 70, fill: "transparent" }, g);   // hit area
-      for (var r = 0; r < 5; r++) {
-        var y = TOP + (FRONT - TOP) * r / 5, h = (FRONT - TOP) / 5;
-        el("rect", { x: x - 4 + (r % 2 ? 4 : 0), y: y, width: 4, height: h, fill: "#fff", opacity: .9 }, g);
-        el("rect", { x: x + (r % 2 ? -4 : 0), y: y, width: 4, height: h, fill: "#111827", opacity: .9 }, g);
-      }
-      el("circle", { cx: x, cy: TOP - 6, r: 6, class: "rd-pin" }, g);
-      var ly = FRONT + SIDE + 24;
-      el("text", { x: x, y: ly, class: "rd-year", "text-anchor": "middle" }, g).textContent = s.year;
-      var t = el("text", { x: x, y: ly + 19, class: "rd-role", "text-anchor": "middle" }, g);
+      el("rect", { x: p.x - 34, y: p.y - 60, width: 68, height: H - p.y + 60, fill: "transparent" }, g);
+      el("line", { x1: p.x, y1: p.y - rw / 2 - 4, x2: p.x, y2: p.y - rw / 2 - 30, class: "rd-pole" }, g);
+      el("path", { d: "M" + p.x + " " + (p.y - rw / 2 - 30) + " l16 4 l-16 6 z", class: "rd-flag" }, g);
+      var ly = p.y + rw / 2 + (narrow ? 20 : 26);
+      el("text", { x: p.x, y: ly, class: "rd-year", "text-anchor": "middle" }, g).textContent = s.year;
+      var tx = el("text", { x: p.x, y: ly + (narrow ? 15 : 19), class: "rd-role", "text-anchor": "middle" }, g);
       if (narrow) {
-        var short = s.short.split("|");
-        el("tspan", { x: x, dy: 0 }, t).textContent = short[0];
-        el("tspan", { x: x, dy: 14 }, t).textContent = short[1];
-      } else t.textContent = s.role;
-      g.addEventListener("click", function () { setTarget(x); });
-      g.addEventListener("focus", function () { setTarget(x); });
+        var sh = s.short.split("|");
+        el("tspan", { x: p.x, dy: 0 }, tx).textContent = sh[0];
+        el("tspan", { x: p.x, dy: 14 }, tx).textContent = sh[1];
+      } else tx.textContent = s.role;
+      g.addEventListener("click", function () { setTarget(lens[i]); });
+      g.addEventListener("focus", function () { setTarget(lens[i]); });
       stopEls.push(g);
     });
 
-    // smoke goes behind the car
-    smokeG = el("g", { class: "rd-smoke" }, svg);
-
-    // the car: 3/4 side view, facing right, wheels on the lane
-    car = el("g", { class: "rd-car" }, svg);
-    carBody = el("g", {}, car);
-    carBody.innerHTML =
-      '<ellipse cx="0" cy="13" rx="40" ry="6" fill="#0f172a" opacity=".3"/>' +
-      '<path d="M-38 6 q-2 -12 8 -14 l12 -2 q8 -12 22 -13 h12 q12 1 20 12 l10 2 q10 3 10 13 v4 h-94z" fill="url(#carRed)"/>' +
-      '<path d="M-14 -11 q7 -10 18 -10 h9 q9 1 15 10 z" fill="url(#carGlass)"/>' +
-      '<path d="M4 -21 v10" stroke="#9f1c1c" stroke-width="2.4"/>' +
-      '<path d="M-36 0 h90" stroke="#ffffff" stroke-opacity=".35" stroke-width="1.5"/>' +
-      '<rect x="48" y="-4" width="8" height="5" rx="2" fill="#fde68a"/>' +
-      '<rect x="-40" y="-3" width="5" height="5" rx="1.5" fill="#7f1d1d"/>';
-    wheels = [-22, 30].map(function (wx) {
-      var w = el("g", { transform: "translate(" + wx + " 9)" }, car);
-      el("circle", { r: 9.5, fill: "#111827" }, w);
-      el("circle", { r: 5, fill: "#cbd5e1" }, w);
-      var spokes = el("g", {}, w);
-      el("path", { d: "M-4.5 0 H4.5 M0 -4.5 V4.5", stroke: "#64748b", "stroke-width": 1.6 }, spokes);
-      return spokes;
+    // a few trees in front of the road, kept clear of the labels
+    var front = el("g", {}, svg);
+    [[0.03, 0.97], [0.26, 0.99], [0.5, 0.97], [0.74, 0.99], [0.98, 0.96]].forEach(function (f) {
+      if (narrow && (f[0] === 0.26 || f[0] === 0.74)) return;
+      pine(front, W * f[0], H * f[1], narrow ? 0.7 : 1);
     });
 
-    if (pos == null) { pos = x0 - 20; target = pos; }
-    else { pos = Math.max(x0 - 20, Math.min(x1 + 10, pos)); target = Math.max(x0 - 20, Math.min(x1 + 10, target)); }
+    smokeG = el("g", {}, svg);
+    car = el("g", { class: "rd-car", filter: "url(#carSh)" }, svg);
+    carImg = el("image", { href: "assets/drive/thar.png", width: CAR_W, height: CAR_H, x: -CAR_W / 2, y: -CAR_H * 0.9 }, car);
+
+    if (pos == null) { pos = 0; target = 0; }
+    pos = Math.min(pos, total); target = Math.min(target, total);
     render();
     if (shown >= 0) placeBoard(shown);
   }
 
-  function setTarget(x) {
-    target = Math.max(x0 - 20, Math.min(x1 + 10, x));
+  function lenAtX(x) {
+    var lo = 0, hi = table.length - 1;
+    if (x <= table[0][0]) return 0;
+    if (x >= table[hi][0]) return total;
+    while (hi - lo > 1) { var m = (lo + hi) >> 1; if (table[m][0] < x) lo = m; else hi = m; }
+    var a = table[lo], b = table[hi];
+    return a[1] + (b[1] - a[1]) * (x - a[0]) / ((b[0] - a[0]) || 1);
+  }
+
+  function setTarget(L) {
+    target = Math.max(0, Math.min(total, L));
     if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(loop); }
   }
 
   function render() {
-    car.setAttribute("transform", "translate(" + pos.toFixed(1) + " " + (LANE - 8) + ") scale(" + (W < 640 ? 0.72 : 1) + ")");
-    carBody.setAttribute("transform", "scale(" + dir + " 1)");
-    wheels.forEach(function (s) { s.setAttribute("transform", "rotate(" + spin.toFixed(0) + ")"); });
+    var p = path.getPointAtLength(pos);
+    var a = path.getPointAtLength(Math.max(0, pos - 3)), b = path.getPointAtLength(Math.min(total, pos + 3));
+    var ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+    ang = Math.max(-14, Math.min(14, ang));
+    car.setAttribute("transform", "translate(" + p.x.toFixed(1) + " " + (p.y + 6).toFixed(1) + ") rotate(" + (ang * dir).toFixed(1) + ") scale(" + dir + " 1)");
+    return p;
   }
 
-  function puff() {
-    var ex = pos - dir * 40 * (W < 640 ? 0.72 : 1), ey = LANE - 4;
+  function puff(p) {
+    // exhaust at the rear of the Thar (left side of the photo, mirrored when driving left)
+    var ex = p.x - dir * CAR_W * 0.46, ey = p.y - CAR_H * 0.18;
     var c = el("circle", { cx: ex, cy: ey, r: 4, fill: "url(#smoke)" }, smokeG);
-    parts.push({ el: c, x: ex, y: ey, r: 4, life: 0, vx: -dir * (0.4 + Math.random() * 0.6), vy: -(0.3 + Math.random() * 0.5) });
+    parts.push({ el: c, x: ex, y: ey, r: 4, life: 0, vx: -dir * (0.5 + Math.random() * 0.7), vy: -(0.3 + Math.random() * 0.6) });
   }
 
-  var puffAcc = 0;
   function loop(now) {
     var dt = Math.min(50, now - lastT) / 16.7; lastT = now;
     var prev = pos;
-    pos += (target - pos) * (reduceMotion ? 1 : Math.min(1, 0.075 * dt));
-    vel = pos - prev;
-    if (Math.abs(vel) > 0.15) dir = vel > 0 ? 1 : -1;
-    spin += vel * 6;
-    // smoke while driving
-    var speed = Math.abs(vel);
-    if (!reduceMotion && speed > 0.6) { puffAcc += speed * 0.12 * dt; while (puffAcc > 1) { puff(); puffAcc -= 1; } }
-    parts = parts.filter(function (p) {
-      p.life += 0.025 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += 0.35 * dt;
-      if (p.life >= 1) { p.el.remove(); return false; }
-      p.el.setAttribute("cx", p.x.toFixed(1)); p.el.setAttribute("cy", p.y.toFixed(1));
-      p.el.setAttribute("r", p.r.toFixed(1)); p.el.setAttribute("opacity", (1 - p.life).toFixed(2));
+    pos += (target - pos) * (reduceMotion ? 1 : Math.min(1, 0.07 * dt));
+    var vel = pos - prev, speed = Math.abs(vel);
+    if (speed > 0.15) dir = vel > 0 ? 1 : -1;
+    var p = render();
+    if (!reduceMotion && speed > 0.6) { puffAcc += speed * 0.12 * dt; while (puffAcc > 1) { puff(p); puffAcc -= 1; } }
+    parts = parts.filter(function (q) {
+      q.life += 0.025 * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.r += 0.4 * dt;
+      if (q.life >= 1) { q.el.remove(); return false; }
+      q.el.setAttribute("cx", q.x.toFixed(1)); q.el.setAttribute("cy", q.y.toFixed(1));
+      q.el.setAttribute("r", q.r.toFixed(1)); q.el.setAttribute("opacity", (1 - q.life).toFixed(2));
       return true;
     });
-    render();
-    // green board when the car arrives at a milestone
     var near = -1;
-    xs.forEach(function (x, i) { if (Math.abs(pos - x) < 16) near = i; });
+    lens.forEach(function (L, i) { if (Math.abs(pos - L) < 18) near = i; });
     if (near !== shown && (near === -1 || speed < 2.5)) showBoard(near);
-    stopEls.forEach(function (g, i) { g.classList.toggle("is-reached", pos >= xs[i] - 16); g.classList.toggle("is-active", i === shown); });
+    stopEls.forEach(function (g, i) { g.classList.toggle("is-reached", pos >= lens[i] - 18); g.classList.toggle("is-active", i === shown); });
     if (Math.abs(target - pos) > 0.3 || parts.length) raf = requestAnimationFrame(loop);
-    else { raf = 0; }
+    else raf = 0;
   }
 
   function showBoard(i) {
@@ -230,23 +263,20 @@
     board.classList.add("show");
   }
   function placeBoard(i) {
-    var bw = board.offsetWidth, x = xs[i];
-    var left = Math.max(4, Math.min(W - bw - 4, x - bw / 2));
-    board.style.left = left.toFixed(0) + "px";
-    board.style.setProperty("--post-x", (x - left).toFixed(0) + "px");
+    var p = path.getPointAtLength(lens[i]);
+    var bw = board.offsetWidth, bh = board.offsetHeight;
+    var left = Math.max(8, Math.min(W - bw - 8, p.x - bw / 2));
+    var sr = svg.getBoundingClientRect(), dr = drive.getBoundingClientRect();
+    var svgTop = sr.top - dr.top;
+    board.style.left = (left + sr.left - dr.left).toFixed(0) + "px";
+    board.style.top = (svgTop + p.y - CAR_H - 30 - bh).toFixed(0) + "px";
+    board.style.setProperty("--post-x", (p.x - left).toFixed(0) + "px");
   }
 
-  // mouse drives the car; touch / click sets where it should go
-  drive.addEventListener("pointermove", function (e) {
-    if (e.pointerType !== "mouse") return;
-    var r = svg.getBoundingClientRect();
-    setTarget(e.clientX - r.left);
-  });
-  drive.addEventListener("pointerdown", function (e) {
-    if (e.pointerType === "mouse") return;
-    var r = svg.getBoundingClientRect();
-    setTarget(e.clientX - r.left);
-  });
+  // the mouse drives the Thar; touch / click sets where it should go
+  function fromEvent(e) { var r = svg.getBoundingClientRect(); return lenAtX(e.clientX - r.left); }
+  drive.addEventListener("pointermove", function (e) { if (e.pointerType === "mouse") setTarget(fromEvent(e)); });
+  drive.addEventListener("pointerdown", function (e) { if (e.pointerType !== "mouse") setTarget(fromEvent(e)); });
 
   build();
   var rt = 0;
