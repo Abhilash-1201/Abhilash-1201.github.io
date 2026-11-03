@@ -272,24 +272,20 @@
   <h2 class="kicker">Experience</h2>
   <div class="rec-intro">
     <h3 class="rec-title">My journey</h3>
-    <p class="rec-sub">From Java developer to Senior Cloud Engineer, one milestone at a time. Click the start point and climb with me, then tap any flag for the details.</p>
+    <p class="rec-sub">From Java developer to Senior Cloud Engineer, one milestone at a time. Then drive the road below through each milestone.</p>
   </div>
   <div class="journey" id="journey">
     <div class="cine" id="cine">
-      <video id="trekVideo" class="cine-video" src="assets/trek/trek.mp4" poster="assets/trek/start.webp" playsinline preload="metadata" aria-label="Abhilash treks up a Himalayan trail to the summit and raises a red flag."></video>
-      <div class="cine-shade" aria-hidden="true"></div>
-      <button type="button" class="cine-start" id="trekStart"><span class="cs-dot" aria-hidden="true"></span><span class="cs-label">Start the trek</span></button>
-      <p class="cine-hint" aria-hidden="true">Click the start point to begin</p>
-      <button type="button" class="cine-btn cine-replay" id="trekReplay" hidden>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"/></svg><span>Replay trek</span>
-      </button>
-      <button type="button" class="cine-btn cine-sound" id="trekSound" aria-pressed="true" hidden>
+      <video id="trekVideo" class="cine-video" src="assets/trek/trek.mp4" poster="assets/trek/start.webp" autoplay loop muted playsinline preload="auto" aria-label="Abhilash treks up a Himalayan trail to the summit and raises a red flag."></video>
+      <button type="button" class="cine-btn cine-sound" id="trekSound" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9v6h4l5 4V5L8 9H4z"/><path class="waves" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="cross" d="M16.5 9.5l5 5m0-5l-5 5"/></svg>
       </button>
-      <div class="cine-progress" aria-hidden="true"><span id="trekBar"></span></div>
     </div>
-    <ol class="trail" id="rail" aria-label="Career milestones: click a flag for details"></ol>
-    <div class="trek-board" id="trekBoard" role="region" aria-live="polite" aria-label="Milestone details" hidden></div>
+    <div class="drive" id="drive">
+      <p class="drive-hint">Move your mouse along the road to drive through my career</p>
+      <div class="green-board" id="driveBoard" aria-live="polite"></div>
+      <svg id="road" class="road3d" focusable="false"></svg>
+    </div>
   </div>
   <ol class="sr-only">
     <li>Java Developer, Neutrinous Solutions Pvt Ltd, April 2019 to May 2020</li>
