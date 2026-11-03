@@ -747,38 +747,20 @@ a:hover .cert-link svg, .all-badges a:hover svg { transform: translate(2px, -2px
 .ct-person .arms-fold { opacity: 0; transition: opacity .25s; }
 .ct-person .arms-down { transition: opacity .25s; }
 .ct-person.folded .arms-fold { opacity: 1; } .ct-person.folded .arms-down { opacity: 0; }
-.ct-road { position: relative; height: 150px; margin: 18px 0 8px; overflow: hidden; }
-.ct-road::after { content: ""; position: absolute; left: 0; right: 0; bottom: 8px; height: 3px; background: repeating-linear-gradient(90deg, #cbd5e1 0 24px, transparent 24px 40px); }
-.ct-truck { position: absolute; left: 0; bottom: 6px; width: 380px; height: 130px; opacity: 0; will-change: transform; }
-.ct-truck.on { opacity: 1; }
-.ct-truck-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.ct-wheel > * { transform-box: fill-box; transform-origin: center; }
-.ct-truck.moving .ct-wheel circle:last-of-type, .ct-truck.moving .ct-wheel path { animation: spin .4s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.ct-box, .ct-fly { position: absolute; top: 4px; width: 58px; height: 54px; display: grid; place-items: center; border-radius: 6px; background: #f5deb3; border: 2px solid #c8a26a; box-shadow: inset 0 -6px 0 rgba(0,0,0,.06); }
-.ct-box img, .ct-fly img { width: 30px; height: 30px; object-fit: contain; background: #fff; border-radius: 6px; padding: 3px; }
-.ct-fly { position: fixed; z-index: 60; margin: 0; pointer-events: none; }
-.ct-puff { position: absolute; bottom: 26px; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle, rgba(148,163,184,.85), rgba(203,213,225,0) 70%); animation: ctpuff 1.3s ease-out forwards; pointer-events: none; }
-@keyframes ctpuff { to { transform: translate(-50px, -46px) scale(3.4); opacity: 0; } }
 .l-icon { width: 26px; height: 26px; object-fit: contain; }
-.ct-done .ct-road { height: 0; margin: 0; transition: height .5s ease, margin .5s ease; }
 /* start states while the animation is armed */
 .ct-armed .ask .w { opacity: 0; transform: translateY(-140%); }
 .ct-armed .ask .w.in { animation: ctdrop .75s cubic-bezier(.3,.7,.3,1) forwards; }
 @keyframes ctdrop { 0% { opacity: 0; transform: translateY(-140%); } 55% { opacity: 1; transform: translateY(8%); } 75% { transform: translateY(-6%); } 100% { opacity: 1; transform: none; } }
-.ct-armed .ct-person { opacity: 0; transform: translateX(-70%) scale(.85); }
-.ct-armed .ct-person.in { opacity: 1; transform: none; }
-.ct-armed .links li { opacity: 0; transform: translateX(-24px); }
+.ct-armed .ct-person { opacity: 0; transform: translateX(110vw); }
+.ct-armed .ct-person.in { opacity: 1; transform: none; transition: transform 1.4s cubic-bezier(.25,.8,.3,1), opacity .2s; animation: ctwalk .35s ease-in-out 4 alternate; }
+@keyframes ctwalk { from { translate: 0 0; rotate: -2deg; } to { translate: 0 -5px; rotate: 2deg; } }
+.ct-armed .links li { opacity: 0; transform: translateX(-60vw); }
 .ct-armed .links li.in { animation: ctrow .55s cubic-bezier(.2,.8,.2,1.2) forwards; }
-@keyframes ctrow { to { opacity: 1; transform: none; } }
+@keyframes ctrow { 0% { opacity: 1; } 80% { transform: translateX(10px); } 100% { opacity: 1; transform: none; } }
 @media (max-width: 760px) {
   .ct-head { align-items: flex-end; }
   .ct-person-wrap { width: 84px; }
-  .ct-road { height: 110px; }
-  .ct-truck { transform-origin: left bottom; width: 280px; height: 96px; }
-  .ct-box { width: 42px; height: 40px; top: 3px; } .ct-box img { width: 22px; height: 22px; }
-  .ct-truck .ct-box:nth-of-type(1) { left: 12px !important; } .ct-truck .ct-box:nth-of-type(2) { left: 59px !important; }
-  .ct-truck .ct-box:nth-of-type(3) { left: 106px !important; } .ct-truck .ct-box:nth-of-type(4) { left: 153px !important; }
   .links li { grid-template-columns: 30px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; row-gap: 2px; }
   .links li .l-icon { grid-column: 1; grid-row: 1 / span 2; align-self: center; }
   .links li .l-label { grid-column: 2; grid-row: 1; } .links li a { grid-column: 2; grid-row: 2; }
