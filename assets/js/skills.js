@@ -21,6 +21,25 @@
     term: "M4 5h16v14H4zM7.5 9.5l3 2.5-3 2.5M12.5 15h4"
   };
 
+  // official logos (Devicon, AWS Architecture Icons, Simple Icons); file names in assets/skills/
+  var LOGO = {"K8s networking": "t-kubernetes", "aws:EC2": "aws-amazonec2", "aws:Auto Scaling": "aws-amazonec2autoscaling", "aws:ELB": "aws-elasticloadbalancing", "aws:EKS": "aws-amazonelastickubernetesservice", "aws:ECS": "aws-amazonelasticcontainerservice", "aws:ECR": "aws-amazonelasticcontainerregistry", "aws:Lambda": "aws-awslambda", "aws:S3": "aws-amazonsimplestorageservice", "aws:RDS": "aws-amazonrds", "aws:Aurora": "aws-amazonaurora", "aws:DMS": "aws-awsdatabasemigrationservice", "aws:VPC": "aws-amazonvirtualprivatecloud", "aws:Route 53": "aws-amazonroute53", "aws:CloudFront": "aws-amazoncloudfront", "aws:IAM": "aws-awsidentityandaccessmanagement", "aws:STS": "aws-awsidentityandaccessmanagement", "aws:KMS": "aws-awskeymanagementservice", "aws:Organizations": "aws-awsorganizations", "aws:CloudWatch": "aws-amazoncloudwatch", "aws:CloudTrail": "aws-awscloudtrail", "aws:CloudFormation": "aws-awscloudformation", "aws:SNS": "aws-amazonsimplenotificationservice", "aws:SQS": "aws-amazonsimplequeueservice", "aws:EventBridge": "aws-amazoneventbridge", "aws:Step Functions": "aws-awsstepfunctions", "aws:CodePipeline": "aws-awscodepipeline", "aws:CodeBuild": "aws-awscodebuild", "aws:CodeDeploy": "aws-awscodedeploy", "AWS": "t-aws", "Azure": "t-azure", "GCP": "t-gcp", "Terraform": "t-terraform", "Ansible": "t-ansible", "Docker": "t-docker", "Kubernetes": "t-kubernetes", "GitHub Actions": "t-github-actions", "GitLab CI/CD": "t-gitlab-ci-cd", "Jenkins": "t-jenkins", "CircleCI": "t-circleci", "Argo CD (GitOps)": "t-argo-cd-gitops", "Maven": "t-maven", "Gradle": "t-gradle", "SonarQube": "t-sonarqube", "Nexus": "t-nexus", "Datadog": "t-datadog", "New Relic": "t-new-relic", "Prometheus": "t-prometheus", "Grafana": "t-grafana", "Opsgenie": "t-opsgenie", "Okta": "t-okta", "OIDC": "t-oidc", "Bash": "t-bash", "Python (Boto3)": "t-python-boto3", "Linux": "t-linux", "Git": "t-git", "Bitbucket": "t-bitbucket", "Jira": "t-jira", "NGINX": "t-nginx", "Amazon EKS": "aws-amazonelastickubernetesservice", "Amazon ECS": "aws-amazonelasticcontainerservice", "Amazon ECR": "aws-amazonelasticcontainerregistry", "AWS CodePipeline": "aws-awscodepipeline", "CodeBuild": "aws-awscodebuild", "CodeDeploy": "aws-awscodedeploy", "IAM least privilege": "aws-awsidentityandaccessmanagement", "Service Control Policies": "aws-awsorganizations", "KMS encryption": "aws-awskeymanagementservice", "S3 security": "aws-amazonsimplestorageservice", "Network ACLs": "aws-amazonvirtualprivatecloud", "VPC design": "aws-amazonvirtualprivatecloud", "Public & private subnets": "aws-amazonvirtualprivatecloud", "Route tables": "aws-amazonvirtualprivatecloud", "Security groups": "aws-amazonvirtualprivatecloud", "NAT & Internet GW": "aws-amazonvirtualprivatecloud", "DNS · Route 53": "aws-amazonroute53", "Load balancing": "aws-elasticloadbalancing", "Remote state · S3 + locking": "aws-amazonsimplestorageservice", "CloudFormation": "aws-awscloudformation", "CloudWatch": "aws-amazoncloudwatch", "CloudTrail": "aws-awscloudtrail", "Log pipelines": "aws-amazoncloudwatch", "OIDC auth": "t-oidc", "Shell scripting": "t-bash", "GitLab": "t-gitlab-ci-cd", "Ingress controllers": "t-nginx", "Reverse proxies": "t-nginx", "Argo CD rollouts": "t-argo-cd-gitops", "Terraform modules": "t-terraform"};
+  var FEATURE = { "Cloud": ["AWS", "Azure", "GCP"], "Infrastructure as Code": ["Terraform", "Ansible", "CloudFormation"],
+    "Containers": ["Docker", "Kubernetes", "Amazon EKS"], "CI/CD": ["GitHub Actions", "GitLab CI/CD", "Jenkins"],
+    "Observability": ["Datadog", "Prometheus", "Grafana"], "Security & governance": ["IAM least privilege", "KMS encryption", "Okta"],
+    "Networking": ["VPC design", "DNS · Route 53", "Load balancing"], "Scripting & tools": ["Bash", "Python (Boto3)", "Linux"] };
+  function logoFor(name, parent) {
+    var key = parent && parent.tone === "aws" ? "aws:" + name : name;
+    if (LOGO[key]) return LOGO[key];
+    if (parent && (parent.tone === "azure" || parent.tone === "gcp")) return LOGO[parent.name];   // provider logo until per-service icons are added
+    return null;
+  }
+  function img(file, cls) { return '<img class="' + cls + '" src="assets/skills/' + file + '.svg" alt="" loading="lazy" decoding="async">'; }
+  function mark(node, cls) {
+    if (LOGO[node.name] && node.tone) return img(LOGO[node.name], cls + " sk-brand");
+    var f = FEATURE[node.name];
+    if (f) return '<span class="sk-trio">' + f.map(function (n) { return LOGO[n] ? img(LOGO[n], "sk-mini") : ""; }).join("") + '</span>';
+    return iconSvg(node.icon);
+  }
   var TREE = { name: "My Skills", icon: "cloud", children: [
     { name: "Cloud", icon: "cloud", children: [
       { name: "AWS", icon: "cloud", tone: "aws", children: ["EC2", "Auto Scaling", "ELB", "EKS", "ECS", "ECR", "Lambda", "S3", "RDS", "Aurora", "DMS",
@@ -65,7 +84,7 @@
     var c = document.createElement(node.parent ? "button" : "div");
     if (node.parent) { c.type = "button"; c.setAttribute("aria-label", "Back to " + node.parent.name); }
     c.className = "sk-center" + (node.tone ? " tone-" + node.tone : "");
-    c.innerHTML = CLOUD + '<span class="sk-c-in">' + iconSvg(node.icon) + '<span class="sk-c-name">' + node.name + '</span>' +
+    c.innerHTML = CLOUD + '<span class="sk-c-in">' + (node.parent ? mark(node, "sk-c-logo") : iconSvg(node.icon)) + '<span class="sk-c-name">' + node.name + '</span>' +
       '<span class="sk-c-sub">' + (node.parent ? "← back" : "Click a cloud to explore") + '</span></span>';
     if (!list) { c.style.left = cx + "px"; c.style.top = cy + "px"; }
     if (node.parent) c.addEventListener("click", function () { render(node.parent, node); });
@@ -108,14 +127,15 @@
         if (isObj) {
           el = document.createElement("button"); el.type = "button";
           el.className = "sk-cat" + (kid.tone ? " tone-" + kid.tone : "");
-          el.innerHTML = CLOUD + '<span class="sk-k-in">' + iconSvg(kid.icon) + '<span class="sk-k-name">' + (kid.short || kid.name) + '</span>' +
+          el.innerHTML = CLOUD + '<span class="sk-k-in">' + mark(kid, "sk-k-logo") + '<span class="sk-k-name">' + (kid.short || kid.name) + '</span>' +
             '<span class="sk-k-n">' + kid.children.length + (kid.children.some(function (z) { return typeof z === "object"; }) ? " platforms" : " skills") + '</span></span>';
           el.setAttribute("aria-label", "Open " + kid.name);
           (function (kd) { el.addEventListener("click", function () { render(kd); }); })(kid);
         } else {
           el = document.createElement("span");
           el.className = "sk-leaf";
-          el.textContent = kid;
+          var lf = logoFor(kid, node);
+          el.innerHTML = (lf ? img(lf, "sk-l-logo") : '<span class="sk-l-dot" aria-hidden="true"></span>') + '<span>' + kid + '</span>';
         }
         if (!list) { el.style.left = x + "px"; el.style.top = y + "px"; }
         el.style.animationDelay = (d + 0.12) + "s";

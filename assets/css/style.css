@@ -592,6 +592,15 @@ button.sk-center:hover .sk-c-sub { color: var(--accent); }
 .sk-k-in { position: relative; display: grid; justify-items: center; gap: 1px; padding-top: 22px; }
 .sk-k-name { font: 800 14.5px/1.15 var(--display); color: var(--ink); text-align: center; }
 .sk-k-n { font: 600 10.5px var(--body); color: var(--muted); }
+/* official logos */
+.sk-trio { display: flex; gap: 6px; align-items: center; justify-content: center; height: 26px; }
+.sk-mini { width: 22px; height: 22px; object-fit: contain; }
+.sk-center .sk-trio { height: 34px; gap: 8px; } .sk-center .sk-mini { width: 30px; height: 30px; }
+.sk-brand.sk-k-logo { width: 46px; height: 28px; object-fit: contain; }
+.sk-brand.sk-c-logo { width: 64px; height: 38px; object-fit: contain; }
+.sk-l-logo { width: 20px; height: 20px; object-fit: contain; flex: 0 0 auto; }
+.sk-l-dot { width: 8px; height: 8px; border-radius: 50%; background: #93c5fd; flex: 0 0 auto; }
+.sk-leaf { display: inline-flex; align-items: center; gap: 8px; }
 /* leaves */
 .sk-leaf { padding: 7px 14px; border: 1.5px solid #93c5fd; border-radius: 999px; background: #fff; color: var(--ink); font: 600 13px var(--body); white-space: nowrap; box-shadow: 0 4px 12px rgba(15,23,42,.06); }
 .sk-map[data-depth="2"] .sk-leaf { font-size: 12.5px; padding: 6px 12px; }
