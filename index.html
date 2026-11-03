@@ -272,11 +272,24 @@
   <h2 class="kicker">Experience</h2>
   <div class="rec-intro">
     <h3 class="rec-title">My journey</h3>
-    <p class="rec-sub">From Java developer to Senior Cloud Engineer, one milestone at a time. Point at a flag and the trekker climbs there.</p>
+    <p class="rec-sub">From Java developer to Senior Cloud Engineer, one milestone at a time. Click the start point and climb with me.</p>
   </div>
   <div class="journey" id="journey">
-    <svg id="trek" class="trek" viewBox="0 0 1200 680" focusable="false"></svg>
-    <div class="dest-board" id="board" aria-live="polite"></div>
+    <div class="cine" id="cine">
+      <video id="trekVideo" class="cine-video" src="assets/trek/trek.mp4" poster="assets/trek/start.webp" playsinline preload="metadata" aria-label="Abhilash treks up a Himalayan trail to the summit and raises a red flag."></video>
+      <div class="cine-shade" aria-hidden="true"></div>
+      <button type="button" class="cine-start" id="trekStart"><span class="cs-dot" aria-hidden="true"></span><span class="cs-label">Start the trek</span></button>
+      <p class="cine-hint" aria-hidden="true">Click the start point to begin</p>
+      <p class="cine-title" aria-hidden="true"><small>Milestone reached</small>Summit reached</p>
+      <button type="button" class="cine-btn cine-replay" id="trekReplay" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"/></svg><span>Replay trek</span>
+      </button>
+      <button type="button" class="cine-btn cine-sound" id="trekSound" aria-pressed="true" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9v6h4l5 4V5L8 9H4z"/><path class="waves" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="cross" d="M16.5 9.5l5 5m0-5l-5 5"/></svg>
+      </button>
+      <div class="cine-progress" aria-hidden="true"><span id="trekBar"></span></div>
+    </div>
+    <ol class="rail" id="rail" aria-label="Career milestones"></ol>
   </div>
   <ol class="sr-only">
     <li>Java Developer, Neutrinous Solutions Pvt Ltd, April 2019 to May 2020</li>
