@@ -433,17 +433,15 @@
 
 <section class="skills wrap" id="skills">
   <h2 class="kicker">Skills</h2>
-  <div class="skill-grid">
-    <div class="skill"><h3>Cloud</h3><p>AWS, Microsoft Azure, AWS Organizations, EC2, EKS, ECS, S3, RDS, Aurora, Lambda, Route 53, Step Functions, EventBridge</p></div>
-    <div class="skill"><h3>Infrastructure as code</h3><p>Terraform, Terraform modules, remote state on S3 with DynamoDB locking, Atlantis, CloudFormation</p></div>
-    <div class="skill"><h3>Containers</h3><p>Docker, Kubernetes, Amazon EKS, Amazon ECS, Ingress controllers, Kubernetes networking, container security</p></div>
-    <div class="skill"><h3>CI/CD</h3><p>GitHub Actions, GitLab CI/CD, Jenkins, CircleCI, Argo CD, AWS CodePipeline, CodeBuild, CodeDeploy, OIDC authentication</p></div>
-    <div class="skill"><h3>Observability</h3><p>Datadog, Amazon CloudWatch, CloudTrail, New Relic, alerting, log pipelines, DORA metrics</p></div>
-    <div class="skill"><h3>Security &amp; governance</h3><p>IAM, Service Control Policies, KMS, S3 security, network ACLs, cloud security posture, Drata compliance remediation</p></div>
-    <div class="skill"><h3>Networking</h3><p>VPC design, public and private subnets, route tables, security groups, DNS, TLS, load balancing, reverse proxies</p></div>
-    <div class="skill"><h3>Cloud operations</h3><p>Cost optimization, resource scheduling, backup and recovery, infrastructure audits, incident troubleshooting</p></div>
-    <div class="skill"><h3>Scripting</h3><p>Bash, shell scripting, Python</p></div>
+  <div class="sk-head">
+    <h3 class="rec-title caps">My Toolbox</h3>
+    <nav class="sk-crumbs" id="skCrumbs" aria-label="Skills navigation"></nav>
   </div>
+  <div class="sk-map" id="skMap">
+    <svg class="sk-lines" id="skLines" aria-hidden="true"></svg>
+    <div class="sk-nodes" id="skNodes"></div>
+  </div>
+  <noscript><p>Cloud: AWS, Azure, GCP · IaC: Terraform, Atlantis, CloudFormation, Ansible · Containers: Docker, Kubernetes, EKS, ECS · CI/CD: GitHub Actions, GitLab CI/CD, Jenkins, CircleCI, Argo CD · Observability: Datadog, CloudWatch, New Relic, Prometheus, Grafana · Security: IAM, SCPs, KMS, OIDC, Okta · Scripting: Bash, Python</p></noscript>
 </section>
 
 <section class="certs wrap" id="certifications">
@@ -609,5 +607,6 @@
 <script src="assets/js/main.js"></script>
 <script src="assets/js/journey.js"></script>
 <script src="assets/js/projects.js"></script>
+<script src="assets/js/skills.js"></script>
 </body>
 </html>
