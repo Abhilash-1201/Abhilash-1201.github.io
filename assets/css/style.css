@@ -440,9 +440,23 @@ main > section + section { border-top: 1px solid var(--line); }
 .outcome b { margin-right: 6px; color: var(--green); }
 
 /* Projects: featured project with an animated picture of what the company does */
-.pf { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 44px; align-items: start; margin-bottom: 28px; padding: 28px; border: 1px solid var(--line); border-radius: 20px; background: #fff; }
-.pf-visual { position: sticky; top: 84px; border-radius: 14px; overflow: hidden; background: #f1f5f9; }
-.pf-scene { display: block; width: 100%; height: auto; }
+.pf { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 44px; align-items: stretch; margin-bottom: 28px; padding: 28px; border: 1px solid var(--line); border-radius: 20px; background: #fff; }
+.pf-visual { position: relative; min-height: 560px; border-radius: 14px; overflow: hidden; background: #f1f5f9; }
+.pf-scene { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.fs-chip { font-size: 11px; font-weight: 700; letter-spacing: .1em; fill: #1e293b; }
+.fs-small { font-size: 10.5px; font-weight: 700; letter-spacing: .14em; fill: #475569; }
+.fs-soc { font-size: 15px; font-weight: 700; fill: #0f766e; }
+.fs-dtitle { font-size: 11px; font-weight: 700; letter-spacing: .14em; fill: #e2e8f0; }
+.fs-pill { font-size: 10px; font-weight: 800; letter-spacing: .12em; fill: #fff; }
+.fs-tlabel { font-size: 9.5px; font-weight: 700; letter-spacing: .12em; fill: #94a3b8; }
+.fs-tval { font-size: 18px; font-weight: 800; fill: #fff; font-family: var(--display); }
+.fs-tunit { font-size: 10px; font-weight: 600; fill: #64748b; }
+.fs-dash { animation: flflow 1s linear infinite; }
+.fs-flow { transition: opacity .5s ease; }
+.pf-scene.is-selling .fs-flow.charge, .pf-scene.is-charging .fs-flow.sell { opacity: 0; }
+.pf-scene.is-selling .fs-win { fill: #fde047; }
+.pf-scene.is-charging .fs-win { fill: #e2e8f0; }
+.fs-win { transition: fill .6s; }
 .pf-scene text { font-family: var(--body); }
 .fl-label { font-size: 11px; font-weight: 700; letter-spacing: .14em; fill: #334155; }
 .fl-panel { font-size: 9.5px; font-weight: 700; letter-spacing: .1em; fill: #e2e8f0; }
@@ -471,7 +485,7 @@ main > section + section { border-top: 1px solid var(--line); }
 .pf-link:hover { text-decoration: underline; }
 @media (max-width: 960px) {
   .pf { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 18px; }
-  .pf-visual { position: static; }
+  .pf-visual { min-height: 0; aspect-ratio: 560 / 1100; max-height: 820px; }
 }
 
 /* Skills */
