@@ -739,11 +739,11 @@ a:hover .cert-link svg, .all-badges a:hover svg { transform: translate(2px, -2px
 .ct-head { position: relative; }
 .ct-head .ask { position: relative; z-index: 2; }
 .ct-head .ask .w { display: inline-block; }
-.ct-person-wrap { position: absolute; z-index: 1; width: clamp(96px, 13vw, 190px); left: 60%; bottom: 0; }
+.ct-person-wrap { position: absolute; z-index: 1; mix-blend-mode: multiply; width: clamp(96px, 13vw, 190px); left: 60%; bottom: 0; }
 .ct-head .ask .w { color: var(--ink); }
 .ct-head .ask .ct-talk .w { color: var(--accent); }
 .ct-person-wrap.below { position: static; margin: 10px 0 0 auto; }
-.ct-person { display: block; width: 100%; height: auto; transition: transform .7s cubic-bezier(.2,.8,.2,1.15), opacity .4s; }
+.ct-person { display: block; width: 100%; height: auto; aspect-ratio: 420 / 630; object-fit: contain; mix-blend-mode: multiply; transition: transform .7s cubic-bezier(.2,.8,.2,1.15), opacity .4s; }
 .ct-person .arms-fold { opacity: 0; transition: opacity .25s; }
 .ct-person .arms-down { transition: opacity .25s; }
 .ct-person.folded .arms-fold { opacity: 1; } .ct-person.folded .arms-down { opacity: 0; }
@@ -753,7 +753,7 @@ a:hover .cert-link svg, .all-badges a:hover svg { transform: translate(2px, -2px
 .ct-armed .ask .w.in { animation: ctdrop .75s cubic-bezier(.3,.7,.3,1) forwards; }
 @keyframes ctdrop { 0% { opacity: 0; transform: translateY(-140%); } 55% { opacity: 1; transform: translateY(8%); } 75% { transform: translateY(-6%); } 100% { opacity: 1; transform: none; } }
 .ct-armed .ct-person { opacity: 0; transform: translateX(110vw); }
-.ct-armed .ct-person.in { opacity: 1; transform: none; transition: transform 1.4s cubic-bezier(.25,.8,.3,1), opacity .2s; animation: ctwalk .35s ease-in-out 4 alternate; }
+.ct-armed .ct-person.in { opacity: 1; transform: none; transition: transform 2.2s cubic-bezier(.3,.6,.3,1), opacity .2s; }
 @keyframes ctwalk { from { translate: 0 0; rotate: -2deg; } to { translate: 0 -5px; rotate: 2deg; } }
 .ct-armed .links li { opacity: 0; transform: translateX(-60vw); }
 .ct-armed .links li.in { animation: ctrow .55s cubic-bezier(.2,.8,.2,1.2) forwards; }

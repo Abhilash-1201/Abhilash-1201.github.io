@@ -35,15 +35,15 @@
     // free space to the right of every line of the heading
     var maxRight = 0;
     words.forEach(function (w) { maxRight = Math.max(maxRight, w.getBoundingClientRect().right); });
-    var gap = 24, avail = h.right - maxRight - gap;
-    if (avail < 90) {                      // phones: no room beside the text, so he stands below it
-      pw.classList.add("below"); pw.style.width = "88px"; pw.style.left = pw.style.bottom = ""; return;
+    var gap = 12, edge = Math.min(window.innerWidth - 8, h.right + 70), avail = edge - maxRight - gap;
+    if (avail < 110) {                      // phones: no room beside the text, so he stands below it
+      pw.classList.add("below"); pw.style.width = "120px"; pw.style.left = pw.style.bottom = ""; return;
     }
     pw.classList.remove("below");
-    var w = Math.min(190, avail);
+    var w = Math.min(240, avail);
     pw.style.width = w.toFixed(0) + "px";
     pw.style.left = (maxRight - h.left + gap + (avail - w) / 2).toFixed(0) + "px";
-    pw.style.bottom = Math.max(0, h.bottom - t.bottom).toFixed(0) + "px";
+    pw.style.bottom = Math.max(0, h.bottom - t.bottom - 6).toFixed(0) + "px";
   }
   place();
   window.addEventListener("resize", place);
@@ -52,7 +52,8 @@
   function showAll() {
     sec.classList.add("ct-done");
     words.forEach(function (w) { w.classList.add("in"); });
-    person.classList.add("in", "folded");
+    person.classList.add("in");
+    person.poster = "assets/contact/abhilash-pose.webp"; person.removeAttribute("src"); person.load();
     rows.forEach(function (r) { r.classList.add("in"); });
   }
   if (reduceMotion || !("IntersectionObserver" in window)) { showAll(); return; }
@@ -65,10 +66,15 @@
     words.forEach(function (w, i) { setTimeout(function () { w.classList.add("in"); }, i * 110); });
     await wait(words.length * 110 + 650);
     // 2. person steps out from behind "LET'S TALK."
-    person.classList.add("in");          // walks in from the right
-    await wait(1500);
-    person.classList.add("folded");      // stops and folds his arms
-    await wait(500);
+    // Abhilash walks in from the right, stops and folds his arms (the video holds on its last frame)
+    person.classList.add("in");
+    try { person.currentTime = 0; await person.play(); } catch (e) {}
+    await new Promise(function (r) {
+      var done = false, fin = function () { if (!done) { done = true; r(); } };
+      person.addEventListener("ended", fin, { once: true });
+      setTimeout(fin, 5600);
+    });
+    await wait(150);
     // 3. contact rows slide in from the left, one by one
     for (var r = 0; r < rows.length; r++) { rows[r].classList.add("in"); await wait(260); }
     sec.classList.add("ct-done");
