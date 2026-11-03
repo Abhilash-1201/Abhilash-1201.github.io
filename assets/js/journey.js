@@ -41,7 +41,6 @@
       dates: "Sep 2023 – Present", duration: since(2023, 9), location: "Bengaluru, Karnataka, India",
       skills: ["AWS", "Google Cloud (GCP)"], current: true }
   ];
-  var SUMMIT_T = 3.7, TITLE_OFF_T = 7.2;
 
   // ---------- milestone flags under the video ----------
   var flags = STOPS.map(function (s, i) {
@@ -109,7 +108,6 @@
     var t = video.currentTime, d = video.duration || 9.7;
     bar.style.width = (t / d * 100).toFixed(2) + "%";
     setReached(t);
-    cine.classList.toggle("at-summit", t >= SUMMIT_T && t < TITLE_OFF_T);
     if (!video.paused && !video.ended) raf = requestAnimationFrame(tick);
   }
 
@@ -125,7 +123,7 @@
   }
 
   video.addEventListener("ended", function () {
-    cine.classList.remove("playing", "at-summit");
+    cine.classList.remove("playing");
     cine.classList.add("ended");
     replayBtn.hidden = false;
     bar.style.width = "100%";
