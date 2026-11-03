@@ -49,6 +49,20 @@
   window.addEventListener("resize", place);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
 
+  // 3D tilt: each card leans toward the cursor
+  if (window.matchMedia("(hover: hover)").matches && !reduceMotion) {
+    sec.querySelectorAll("a.cc").forEach(function (card) {
+      card.addEventListener("pointermove", function (e) {
+        var r = card.getBoundingClientRect(), px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        card.style.setProperty("--ry", ((px - .5) * 14).toFixed(2) + "deg");
+        card.style.setProperty("--rx", ((.5 - py) * 12).toFixed(2) + "deg");
+        card.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
+        card.style.setProperty("--my", (py * 100).toFixed(1) + "%");
+      });
+      card.addEventListener("pointerleave", function () { card.style.setProperty("--rx", "0deg"); card.style.setProperty("--ry", "0deg"); });
+    });
+  }
+
   function showAll() {
     sec.classList.add("ct-done");
     words.forEach(function (w) { w.classList.add("in"); });
@@ -76,7 +90,7 @@
     });
     await wait(150);
     // 3. contact rows slide in from the left, one by one
-    for (var r = 0; r < rows.length; r++) { rows[r].classList.add("in"); await wait(260); }
+    for (var r = 0; r < rows.length; r++) { rows[r].classList.add("in"); await wait(320); }
     sec.classList.add("ct-done");
   }
 
