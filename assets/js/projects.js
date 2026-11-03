@@ -377,12 +377,215 @@
     pillBg.setAttribute("fill", alerts ? "#78350f" : "#14532d");
     // the phone: a new policy is bought, then issued
     policies++;
-    phStatus.textContent = "Policy #" + (24800 + policies) + " issued ✓";
+    phStatus.textContent = "#" + (24800 + policies) + " issued ✓";
     phBtn.setAttribute("fill", "#16a34a"); phBtnTx.textContent = "COVERED";
     setTimeout(function () { phStatus.textContent = "Buying…"; phBtn.setAttribute("fill", "#2563eb"); phBtnTx.textContent = "PAY"; }, 2200);
   }
   step();
   if (!reduceMotion) setInterval(function () { if (visible) step(); }, 4200);
+  if ("IntersectionObserver" in window && !reduceMotion) {
+    new IntersectionObserver(function (en) {
+      visible = en[0].isIntersecting;
+      if (svg.pauseAnimations) visible ? svg.unpauseAnimations() : svg.pauseAnimations();
+    }).observe(svg);
+  }
+})();
+
+/* Projects: the Khushi Baby scene. A community health worker records care for a mother and baby;
+   the data syncs to the CHIP platform running across three state datacenters and AWS; Abhilash's
+   assessment scans every layer; a dashboard shows the seven areas reviewed and the live activity. */
+(function () {
+  "use strict";
+  var svg = document.getElementById("kbScene");
+  if (!svg) return;
+  var NS = "http://www.w3.org/2000/svg";
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function el(tag, attrs, parent, text) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    (parent || svg).appendChild(n);
+    return n;
+  }
+  el("defs").innerHTML =
+    '<linearGradient id="kbSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fecdd3"/><stop offset=".5" stop-color="#ffe4e6"/><stop offset="1" stop-color="#fff7ed"/></linearGradient>' +
+    '<linearGradient id="kbRack" x1="0" x2="1"><stop offset="0" stop-color="#334155"/><stop offset="1" stop-color="#1e293b"/></linearGradient>' +
+    '<linearGradient id="kbCloud" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff1e6"/></linearGradient>' +
+    '<radialGradient id="kbGlow"><stop offset="0" stop-color="#fff1f2"/><stop offset=".4" stop-color="#f43f5e"/><stop offset="1" stop-color="#f43f5e" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="kbLens"><stop offset="0" stop-color="#fff" stop-opacity=".15"/><stop offset="1" stop-color="#bfdbfe" stop-opacity=".45"/></radialGradient>';
+
+  el("rect", { width: 560, height: 1100, fill: "#f8fafc" });
+  // ---------- 1. village: health worker + mother and baby ----------
+  el("rect", { width: 560, height: 470, fill: "url(#kbSky)" });
+  el("circle", { cx: 460, cy: 76, r: 30, fill: "#fb923c", opacity: .85 });
+  el("path", { d: "M0 330 C120 300 250 322 360 312 C450 304 510 318 560 314 V470 H0Z", fill: "#fde68a" });
+  el("path", { d: "M0 372 C160 356 330 378 560 366 V470 H0Z", fill: "#fcd34d", opacity: .6 });
+  function hut(x, y, s) {
+    var g = el("g", { transform: "translate(" + x + " " + y + ") scale(" + s + ")" });
+    el("rect", { x: 0, y: 30, width: 90, height: 56, fill: "#fff7ed", stroke: "#d6a77a" }, g);
+    el("polygon", { points: "-10,34 45,-8 100,34", fill: "#b45309" }, g);
+    el("rect", { x: 36, y: 50, width: 18, height: 36, rx: 2, fill: "#92400e" }, g);
+    el("rect", { x: 10, y: 46, width: 16, height: 14, fill: "#fde68a", stroke: "#d6a77a" }, g);
+  }
+  hut(40, 248, 1.1); hut(400, 262, .9);
+  el("circle", { cx: 200, cy: 316, r: 26, fill: "#16a34a" }); el("rect", { x: 197, y: 330, width: 6, height: 24, fill: "#78350f" });
+  function person(x, y, s, sari, head) {
+    var g = el("g", { transform: "translate(" + x + " " + y + ") scale(" + s + ")" });
+    el("circle", { cx: 0, cy: -58, r: 10, fill: "#a16207" }, g);
+    if (head) el("path", { d: "M-11 -60 a11 11 0 0 1 22 0 v10 h-4 v-8 h-14 v8 h-4z", fill: sari }, g);
+    el("path", { d: "M-14 -46 h28 l8 50 h-44z", fill: sari }, g);
+    el("rect", { x: -8, y: 4, width: 6, height: 14, rx: 3, fill: "#78350f" }, g);
+    el("rect", { x: 2, y: 4, width: 6, height: 14, rx: 3, fill: "#78350f" }, g);
+    return g;
+  }
+  // health worker holding a phone
+  var asha = person(262, 386, 1.2, "#db2777", true);
+  el("rect", { x: 14, y: -38, width: 12, height: 20, rx: 2, fill: "#0f172a" }, asha);
+  var screen = el("rect", { x: 15.5, y: -36, width: 9, height: 15, rx: 1, fill: "#22c55e" }, asha);
+  // mother with baby
+  var mom = person(338, 388, 1.15, "#7c3aed", true);
+  el("ellipse", { cx: -10, cy: -32, rx: 10, ry: 7, fill: "#fde68a" }, mom);
+  el("circle", { cx: -16, cy: -34, r: 5, fill: "#a16207" }, mom);
+  // record card that pops above the phone
+  var card = el("g", { transform: "translate(212 196)", class: "kb-card" });
+  el("rect", { width: 150, height: 74, rx: 10, fill: "#fff", stroke: "#fda4af" }, card);
+  el("text", { x: 12, y: 20, class: "kb-ct" }, card, "CHIP · HEALTH RECORD");
+  var cardL = [el("text", { x: 12, y: 40, class: "kb-cl" }, card, ""), el("text", { x: 12, y: 58, class: "kb-cl" }, card, "")];
+  var chips = [];
+  function chip(x, y, text, color) { chips.push([x, y, text, color]); }
+  chip(280, 444, "1 · HEALTH WORKERS RECORD CARE IN THE FIELD", "#fda4af");
+
+  // ---------- 2. three state datacenters + AWS, running Kubernetes ----------
+  var dcs = [["KARNATAKA", 40], ["MAHARASHTRA", 196], ["RAJASTHAN", 352]], racks = [];
+  dcs.forEach(function (d) {
+    var g = el("g", { transform: "translate(" + d[1] + " 520)" });
+    el("rect", { width: 168, height: 112, rx: 10, fill: "#fff", stroke: "#e2e8f0" }, g);
+    for (var r = 0; r < 3; r++) {
+      var rk = el("g", { transform: "translate(" + (14 + r * 50) + " 14)" }, g);
+      el("rect", { width: 40, height: 70, rx: 4, fill: "url(#kbRack)" }, rk);
+      for (var u = 0; u < 5; u++) {
+        el("rect", { x: 5, y: 7 + u * 12, width: 22, height: 3, rx: 1.5, fill: "#475569" }, rk);
+        racks.push(el("circle", { cx: 33, cy: 8.5 + u * 12, r: 2, fill: "#22c55e", class: "led " + ["a", "b", "c"][(u + r) % 3] }, rk));
+      }
+    }
+    el("text", { x: 84, y: 102, "text-anchor": "middle", class: "kb-small" }, g, d[0]);
+  });
+  // AWS cloud + Kubernetes components
+  var cl = el("g", { transform: "translate(280 690)" });
+  el("path", { d: "M-226 34 a26 26 0 0 1 8 -50 a40 40 0 0 1 74 -22 h300 a40 40 0 0 1 74 22 a26 26 0 0 1 8 50z", fill: "url(#kbCloud)", stroke: "#fdba74", "stroke-width": 2 }, cl);
+  el("text", { x: -206, y: -14, class: "kb-small" }, cl, "AWS · KUBERNETES");
+  ["NGINX", "HAProxy", "Redis", "RabbitMQ", "OpenEBS"].forEach(function (n, i) {
+    var g = el("g", { transform: "translate(" + (-206 + i * 84) + " -4)" }, cl);
+    el("rect", { width: 76, height: 28, rx: 7, fill: "#fff", stroke: "#fed7aa" }, g);
+    el("polygon", { points: "13,6 20,10 20,18 13,22 6,18 6,10", fill: "#326ce5" }, g);
+    el("text", { x: 26, y: 18.5, class: "kb-pod" }, g, n);
+  });
+  // magnifying glass that scans every layer
+  var lens = el("g", { class: "kb-scan" });
+  el("circle", { r: 30, fill: "url(#kbLens)", stroke: "#1e293b", "stroke-width": 5 }, lens);
+  el("line", { x1: 21, y1: 21, x2: 44, y2: 44, stroke: "#1e293b", "stroke-width": 8, "stroke-linecap": "round" }, lens);
+  chip(280, 752, "2 · CHIP RUNS ACROSS 3 STATE DATACENTERS + AWS", "#fdba74");
+
+  // ---------- 3. the assessment: seven areas ----------
+  var AREAS = ["Infrastructure", "Kubernetes", "CI/CD", "Monitoring", "Security", "Backup & DR", "Docs"];
+  var ticks = AREAS.map(function (a, i) {
+    var col = i % 4, row = Math.floor(i / 4);
+    var g = el("g", { transform: "translate(" + (28 + col * 128 + (row ? 64 : 0)) + " " + (786 + row * 40) + ")" });
+    var box = el("rect", { width: 120, height: 30, rx: 15, fill: "#fff", stroke: "#cbd5e1" }, g);
+    var dot = el("circle", { cx: 15, cy: 15, r: 7, fill: "#e2e8f0" }, g);
+    var chk = el("path", { d: "M11.5 15 l2.5 2.5 l5 -5", fill: "none", stroke: "#fff", "stroke-width": 2, "stroke-linecap": "round", opacity: 0 }, g);
+    el("text", { x: 28, y: 19.5, class: "kb-area" }, g, a);
+    return { box: box, dot: dot, chk: chk };
+  });
+  chip(280, 890, "3 · I ASSESSED EVERY LAYER AND BUILT THE ROADMAP", "#86efac");
+
+  // ---------- flows: field → datacenters → cloud ----------
+  function flow(id, d, n, dur) {
+    el("path", { d: d, fill: "none", stroke: "#e2e8f0", "stroke-width": 3, "stroke-linecap": "round" });
+    var g = el("g", {});
+    el("path", { id: id, d: d, fill: "none", stroke: "#fb7185", "stroke-width": 2, "stroke-dasharray": "4 10", class: "fs-dash" }, g);
+    if (reduceMotion) return;
+    for (var i = 0; i < n; i++) {
+      var c = el("circle", { r: 6, fill: "url(#kbGlow)" }, g);
+      var m = el("animateMotion", { dur: dur + "s", repeatCount: "indefinite", begin: (-i * dur / n).toFixed(2) + "s" }, c);
+      el("mpath", { href: "#" + id }, m);
+    }
+  }
+  flow("kbf1", "M286 344 C286 420 124 440 124 520", 3, 2.4);
+  flow("kbf2", "M286 344 C286 430 280 470 280 520", 3, 2.0);
+  flow("kbf3", "M286 344 C286 420 436 440 436 520", 3, 2.4);
+  chips.forEach(function (c) {
+    var g = el("g", { transform: "translate(" + c[0] + " " + c[1] + ")" });
+    var w = c[2].length * 6.7 + 26;
+    el("rect", { x: -w / 2, y: -13, width: w, height: 26, rx: 13, fill: "#fff", stroke: c[3] }, g);
+    el("text", { x: 0, y: 4.5, "text-anchor": "middle", class: "fs-chip" }, g, c[2]);
+  });
+  svg.appendChild(lens);   // the lens moves over everything
+
+  // ---------- dashboard ----------
+  var dash = el("g", { transform: "translate(20 920)" });
+  el("rect", { width: 520, height: 168, rx: 14, fill: "#0f172a" }, dash);
+  el("text", { x: 18, y: 26, class: "fs-dtitle" }, dash, "DEVOPS MATURITY ASSESSMENT");
+  var pill = el("g", { transform: "translate(400 12)" }, dash);
+  var pillBg = el("rect", { width: 104, height: 22, rx: 11, fill: "#7c2d12" }, pill);
+  var pillTx = el("text", { x: 52, y: 15, "text-anchor": "middle", class: "fs-pill" }, pill, "ASSESSING");
+  [["DATACENTERS", "3", "states"], ["ENVIRONMENTS", "3", "dev·uat·prod"], ["AREAS", "0/7", "reviewed"], ["DELIVERABLE", "—", ""]].forEach(function (t, i) {
+    var g = el("g", { transform: "translate(" + (18 + i * 124) + " 40)" }, dash);
+    el("rect", { width: 114, height: 46, rx: 8, fill: "#1e293b" }, g);
+    el("text", { x: 10, y: 16, class: "fs-tlabel" }, g, t[0]);
+    var v = el("text", { x: 10, y: 37, class: "fs-tval" }, g, t[1]);
+    el("text", { x: 104, y: 37, "text-anchor": "end", class: "fs-tunit" }, g, t[2]);
+    if (i === 2) areasTx = v; if (i === 3) delivTx = v;
+  });
+  var areasTx, delivTx;
+  el("text", { x: 18, y: 106, class: "fs-tlabel" }, dash, "NOW REVIEWING");
+  var logs = [0, 1].map(function (i) { return el("text", { x: 18, y: 128 + i * 22, class: "av-log" }, dash, ""); });
+
+  // ---------- the assessment loop ----------
+  var TASKS = [
+    [0, "Infrastructure · VMs, storage & networking in KA, MH, RJ", [124, 576]],
+    [1, "Kubernetes · control plane, nodes, namespaces, pod health", [280, 690]],
+    [2, "CI/CD · branch protection, PR flow, GitHub Actions", [124, 576]],
+    [3, "Monitoring · New Relic, Prometheus, CloudWatch alerts", [436, 576]],
+    [4, "Security · secrets, access controls, vulnerability scans", [280, 576]],
+    [5, "Backup & DR · DB backups, restore tests, DR runbooks", [436, 576]],
+    [6, "Report · findings + roadmap for automation & security", [280, 690]]
+  ];
+  var RECORDS = [["Mother: Sunita · 7 months", "Visit 4 · Hb checked ✓"], ["Baby: Aarav · 9 weeks", "Vaccine: Penta-2 given ✓"], ["Mother: Kavita · 5 months", "BP recorded · referral ✓"]];
+  var ti = 0, ri = 0, visible = true, lx = 280, ly = 640;
+  function moveLens(x, y) {
+    if (reduceMotion) { lens.setAttribute("transform", "translate(" + x + " " + y + ")"); return; }
+    var fx = lx, fy = ly, t0 = performance.now();
+    (function st(now) {
+      var t = Math.min(1, (now - t0) / 900), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      lx = fx + (x - fx) * e; ly = fy + (y - fy) * e;
+      lens.setAttribute("transform", "translate(" + lx.toFixed(1) + " " + ly.toFixed(1) + ")");
+      if (t < 1) requestAnimationFrame(st);
+    })(t0);
+  }
+  function step() {
+    // a new record captured in the field
+    var r = RECORDS[ri++ % RECORDS.length];
+    cardL[0].textContent = r[0]; cardL[1].textContent = r[1];
+    card.classList.remove("pop"); void card.getBBox(); card.classList.add("pop");
+    // the next area of the assessment
+    var t = TASKS[ti % TASKS.length];
+    if (ti % TASKS.length === 0) ticks.forEach(function (k) { k.dot.setAttribute("fill", "#e2e8f0"); k.chk.setAttribute("opacity", 0); k.box.setAttribute("stroke", "#cbd5e1"); });
+    var k = ticks[t[0]];
+    k.dot.setAttribute("fill", "#16a34a"); k.chk.setAttribute("opacity", 1); k.box.setAttribute("stroke", "#86efac");
+    moveLens(t[2][0], t[2][1]);
+    var done = t[0] + 1;
+    areasTx.textContent = done + "/7";
+    var ready = done === 7;
+    delivTx.textContent = ready ? "Report" : "—";
+    pillTx.textContent = ready ? "REPORT READY" : "ASSESSING";
+    pillBg.setAttribute("fill", ready ? "#14532d" : "#7c2d12");
+    logs[1].textContent = logs[0].textContent;
+    logs[0].textContent = t[1];
+    ti++;
+  }
+  step();
+  if (!reduceMotion) setInterval(function () { if (visible) step(); }, 2600);
   if ("IntersectionObserver" in window && !reduceMotion) {
     new IntersectionObserver(function (en) {
       visible = en[0].isIntersecting;
