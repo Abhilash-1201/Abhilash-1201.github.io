@@ -817,9 +817,27 @@ a:hover .cert-link svg, .all-badges a:hover svg { transform: translate(2px, -2px
 }
 
 /* Footer */
+.foot-stage { position: relative; cursor: default; }
+.foot-stage .foot-name { transition: color .4s ease, opacity .4s ease; }
+.foot-hint { position: absolute; left: 0; right: 0; bottom: 8px; margin: 0; text-align: center; font: 600 11px var(--body); letter-spacing: .2em; text-transform: uppercase; color: #94a3b8; transition: opacity .3s; pointer-events: none; }
+.foot-tools { position: absolute; inset: 10px 3% 0; pointer-events: none; }
+.foot-tools img {
+  position: absolute; width: clamp(26px, 3vw, 44px); height: clamp(26px, 3vw, 44px); object-fit: contain;
+  padding: 6px; border-radius: 12px; background: #fff; box-shadow: 0 8px 20px rgba(15,23,42,.12), 0 0 0 1px #eef1f5;
+  transform: translate(-50%, -50%) scale(0) rotate(var(--r)); opacity: 0;
+  transition: transform .45s cubic-bezier(.2,.8,.2,1.4) var(--d), opacity .25s ease var(--d);
+}
+.foot-stage:hover .foot-tools img, .foot-stage.show .foot-tools img {
+  opacity: 1; transform: translate(-50%, -50%) scale(var(--s)) rotate(0deg);
+  animation: footfloat var(--f) ease-in-out calc(var(--d) + .45s) infinite alternate;
+}
+@keyframes footfloat { from { translate: 0 0; } to { translate: 0 -8px; } }
+.foot-stage:hover .foot-name, .foot-stage.show .foot-name { color: #f8fafc; }
+.foot-stage:hover .foot-hint, .foot-stage.show .foot-hint { opacity: 0; }
+@media (hover: none) { .foot-hint::after { content: " (tap)"; } }
 .foot { overflow: hidden; border-top: 1px solid var(--line); }
 .foot-name { margin: 0; padding-top: 40px; text-align: center; white-space: nowrap; font: 900 15vw/.8 var(--display); font-stretch: 78%; letter-spacing: -0.04em; color: #F1F3F6; user-select: none; }
-.foot-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding-block: 22px 30px; color: var(--muted); font-size: 14px; }
+.foot-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; padding-block: 22px 30px; color: var(--muted); font-size: 14px; }
 .foot-row code { font: 500 13px var(--mono); }
 
 /* =====================================================================
